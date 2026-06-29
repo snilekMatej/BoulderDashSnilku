@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35828.75 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoulderDashSnilku", "BoulderDashSnilku.csproj", "{985CFE4D-11CB-B71F-C2E2-F90E2835C1AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{985CFE4D-11CB-B71F-C2E2-F90E2835C1AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{985CFE4D-11CB-B71F-C2E2-F90E2835C1AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{985CFE4D-11CB-B71F-C2E2-F90E2835C1AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{985CFE4D-11CB-B71F-C2E2-F90E2835C1AF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA44A481-78CB-4EE8-BCD4-E90BD7373087}
+	EndGlobalSection
+EndGlobal
