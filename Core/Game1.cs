@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace BoulderDashSnilku;
+namespace BoulderDashSnilku.Core;
 
 public class Game1 : Game
 {
