@@ -22,8 +22,8 @@ namespace BoulderDashSnilku.Input
         private KeyboardState _current;
 
         private double _holdTimer = 0;
-        private const double Holdinterval = 0.1; // 100 millisecnds
-        private MoveDirection _lastDirection = MoveDirection.None;
+        private const double Holdinterval = 0.125; // 125 millisecnds
+        private MoveDirection _heldDirection = MoveDirection.None;
 
         public void Update(GameTime gameTime)
         {
@@ -35,12 +35,42 @@ namespace BoulderDashSnilku.Input
 
         public MoveDirection GetMoveDirection()
         {
-            // IMPORTANT: edge detection (one press = one move)
-            if (IsPressed(Keys.Up)) return MoveDirection.Up;
-            if (IsPressed(Keys.Down)) return MoveDirection.Down;
-            if (IsPressed(Keys.Left)) return MoveDirection.Left;
-            if (IsPressed(Keys.Right)) return MoveDirection.Right;
+            MoveDirection Direction = MoveDirection.None;
 
+            if (_current.IsKeyDown(Keys.Up))
+            {
+                Direction = MoveDirection.Up;
+            }
+            if (_current.IsKeyDown(Keys.Down))
+            {
+                Direction = MoveDirection.Down;
+            }
+            if (_current.IsKeyDown(Keys.Left))
+            {
+                Direction = MoveDirection.Left;
+            }
+            if (_current.IsKeyDown(Keys.Right))
+            {
+                Direction = MoveDirection.Right;
+            }
+
+            if (Direction == MoveDirection.None)
+            {
+                _heldDirection = Direction;
+                _holdTimer = 0;
+                return MoveDirection.None;
+            }
+            if (Direction != _heldDirection)
+            {
+                _heldDirection = Direction;
+                _holdTimer = 0;
+                return Direction;
+            }
+            if (_holdTimer >= Holdinterval)
+            {
+                _holdTimer = 0;
+                return _heldDirection;
+            }
             return MoveDirection.None;
         }
 
