@@ -29,6 +29,10 @@ namespace BoulderDashSnilku.World
             }
             Grid[5, 5] = Tile.Boulder;
             Grid[6, 5] = Tile.Gem;
+            Grid[6, 7] = Tile.Gem;
+            Grid[6, 9] = Tile.Gem;
+            Grid[6, 11] = Tile.Gem;
+            Grid[7, 5] = Tile.Border;
             Grid[8, 5] = Tile.Wall;
         }
     }

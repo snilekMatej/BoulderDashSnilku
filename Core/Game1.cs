@@ -84,6 +84,7 @@ public class Game1 : Game
                 {
                     case Tile.Dirt: color = Color.SaddleBrown; break;
                     case Tile.Wall: color = Color.Gray; break;
+                    case Tile.Border: color = Color.DarkBlue; break;
                     case Tile.Boulder: color = Color.DarkSlateGray; break;
                     case Tile.Gem: color = Color.Yellow; break;
                     case Tile.Empty: color = Color.Black; break;

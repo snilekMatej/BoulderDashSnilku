@@ -35,6 +35,31 @@ namespace BoulderDashSnilku.Simulation
                 default:
                     return;
             }
+            // Temporary / safety to not let player move off screen.
+            if ((targetX < 0 || targetX >= world.Width) || (targetY < 0 || targetY >= world.Height))
+            {
+                return;
+            }
+            Tile targetTile = world.Grid[targetX, targetY];
+            // colisions:
+            if (targetTile == Tile.Wall || targetTile == Tile.Border)
+            {
+                return;
+            }
+            if (targetTile == Tile.Boulder)
+            {
+                return; // Future: Push boulder logic
+            }
+            if (targetTile == Tile.Dirt)
+            {
+                world.Grid[targetX, targetY] = Tile.Empty;
+            }
+            if (targetTile == Tile.Gem)
+            {
+                world.Grid[targetX, targetY] = Tile.Empty;
+                // future: Score++;
+            }
+
             player.MoveTo(targetX, targetY);
         }
     }

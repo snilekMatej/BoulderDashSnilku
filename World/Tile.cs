@@ -11,6 +11,7 @@ namespace BoulderDashSnilku.World
         Empty,
         Dirt,
         Wall,
+        Border,
         Boulder,
         Gem,
         Entrance,
