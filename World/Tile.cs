@@ -13,6 +13,7 @@ namespace BoulderDashSnilku.World
         Wall,
         Boulder,
         Gem,
-        Player
+        Entrance,
+        Exit
     }
 }

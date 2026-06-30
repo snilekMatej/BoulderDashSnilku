@@ -21,13 +21,14 @@ namespace BoulderDashSnilku.World
             Grid = new Tile[Width, Height];
 
             for (int y = 0; y < Height; y++)
-            for (int x = 0; x < Width; x++)
             {
-                Grid[x, y] = Tile.Dirt;
+                for (int x = 0; x < Width; x++)
+                {
+                    Grid[x, y] = Tile.Dirt;
+                }
             }
             Grid[5, 5] = Tile.Boulder;
             Grid[6, 5] = Tile.Gem;
-            Grid[7, 5] = Tile.Player;
             Grid[8, 5] = Tile.Wall;
         }
     }
