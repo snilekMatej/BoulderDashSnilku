@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace BoulderDashSnilku.World
 {
-    class Tile
+    public enum Tile
     {
+        Empty,
+        Dirt,
+        Wall,
+        Boulder,
+        Gem,
+        Player
     }
 }
