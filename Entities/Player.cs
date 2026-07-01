@@ -6,22 +6,10 @@ using System.Threading.Tasks;
 
 namespace BoulderDashSnilku.Entities
 {
-    public class Player
+    public class Player : Entity
     {
-        public int x { get; private set; }
-        public int y { get; private set; }
-
-        public Player(int x, int y)
+        public Player(int x, int y) : base(x, y)
         {
-            this.x = x;
-            this.y = y;
         }
-
-        public void MoveTo(int x, int y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-
     }
 }

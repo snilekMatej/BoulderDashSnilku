@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BoulderDashSnilku.Simulation
+namespace BoulderDashSnilku.Entities
 {
-    class Physics
+    class EntityManager
     {
     }
 }

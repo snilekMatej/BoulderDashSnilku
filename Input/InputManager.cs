@@ -22,7 +22,7 @@ namespace BoulderDashSnilku.Input
         private KeyboardState _current;
 
         private double _holdTimer = 0;
-        private const double Holdinterval = 0.125; // 125 millisecnds
+        private const double Holdinterval = 0.1; // 100 millisecnds
         private MoveDirection _heldDirection = MoveDirection.None;
 
         public void Update(GameTime gameTime)

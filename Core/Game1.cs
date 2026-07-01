@@ -12,9 +12,11 @@ namespace BoulderDashSnilku.Core;
 public class Game1 : Game
 {
     private GameWorld world;
+    private EntityManager entityManager;
     private Player player;
 
     private PlayerLogic playerLogic;
+    private WorldSimulation worldSimulation;
     private InputManager _input;
 
     private GraphicsDeviceManager _graphics;
@@ -32,9 +34,13 @@ public class Game1 : Game
     {
         // TODO: Add your initialization logic here
         world = new GameWorld();
+        entityManager = new EntityManager();
         player = new Player(2, 4);
 
+
+
         playerLogic = new PlayerLogic();
+        worldSimulation = new WorldSimulation();
         _input = new InputManager();
 
         base.Initialize();
@@ -56,6 +62,8 @@ public class Game1 : Game
 
         MoveDirection direction = _input.GetMoveDirection();
         playerLogic.Update(player, world, direction);
+
+        worldSimulation.Update(world, player, gameTime);
 
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
