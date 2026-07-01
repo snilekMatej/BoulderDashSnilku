@@ -13,9 +13,11 @@ namespace BoulderDashSnilku.Simulation
         public void Update(GameWorld world, EntityManager entityManager, int x, int y, bool boulderFalling, bool[,] nextFallingObjects)
         {
             bool entityBellow = entityManager.HasEntityAt(x, y + 1);
+            Tile tileBellow = world.Grid[x, y + 1];
             nextFallingObjects[x, y] = false;
-            if (world.Grid[x, y + 1] == Tile.Empty)
+            if (tileBellow == Tile.Empty)
             {
+                // I will fall :|
                 if (entityBellow && !boulderFalling)
                 {
                     return;
@@ -34,6 +36,22 @@ namespace BoulderDashSnilku.Simulation
                 {
                     world.Grid[x, y + 1] = Tile.Boulder;
                     nextFallingObjects[x, y + 1] = true;
+                    world.Grid[x, y] = Tile.Empty;
+                }
+            }
+            else if (tileBellow == Tile.Wall || tileBellow == Tile.Boulder || tileBellow == Tile.Gem)
+            {
+                // I might roll off :)
+                if (x < world.Width - 1)
+                {
+                    world.Grid[x + 1, y] = Tile.Boulder;
+                    nextFallingObjects[x + 1, y] = true;
+                    world.Grid[x, y] = Tile.Empty;
+                }
+                else if (world.Grid[x - 1, y] == Tile.Empty && world.Grid[x - 1, y + 1] == Tile.Empty)
+                {
+                    world.Grid[x - 1, y + 1] = Tile.Boulder;
+                    nextFallingObjects[x - 1, y + 1] = true;
                     world.Grid[x, y] = Tile.Empty;
                 }
             }
