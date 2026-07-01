@@ -8,8 +8,6 @@ namespace BoulderDashSnilku.Entities
 {
     public class Player : Entity
     {
-        public Player(int x, int y) : base(x, y)
-        {
-        }
+        public Player(int x, int y) : base(x, y) { }
     }
 }

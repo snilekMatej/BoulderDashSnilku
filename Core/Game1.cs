@@ -35,9 +35,9 @@ public class Game1 : Game
         // TODO: Add your initialization logic here
         world = new GameWorld();
         entityManager = new EntityManager();
+        
         player = new Player(2, 4);
-
-
+        entityManager.Add(player);
 
         playerLogic = new PlayerLogic();
         worldSimulation = new WorldSimulation();
@@ -63,7 +63,7 @@ public class Game1 : Game
         MoveDirection direction = _input.GetMoveDirection();
         playerLogic.Update(player, world, direction);
 
-        worldSimulation.Update(world, player, gameTime);
+        worldSimulation.Update(world, entityManager, gameTime);
 
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
@@ -102,7 +102,7 @@ public class Game1 : Game
             }
         }
         // Draw PLayer
-        _spriteBatch.Draw(pixel, new Rectangle(player.x * TileSize, player.y * TileSize, TileSize, TileSize), Color.Cyan);
+        _spriteBatch.Draw(pixel, new Rectangle(player.x * TileSize, player.y * TileSize, TileSize, TileSize), player.isAlive ? Color.Cyan : Color.Red);
 
         _spriteBatch.End();
         base.Draw(gameTime);

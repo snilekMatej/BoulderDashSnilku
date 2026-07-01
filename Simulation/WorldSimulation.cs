@@ -27,6 +27,8 @@ namespace BoulderDashSnilku.Simulation
             {
                 fallingObjects = new bool[world.Width, world.Height];
             }
+            bool[,] nextFallingObjects = new bool[world.Width, world.Height];
+
             if (_accumulator < StepTime)
             {
                 return;
@@ -39,14 +41,15 @@ namespace BoulderDashSnilku.Simulation
                 {
                     if (world.Grid[x, y] == Tile.Boulder)
                     {
-                        boulderLogic.Update(world, entityManager, x, y);
+                        boulderLogic.Update(world, entityManager, x, y, fallingObjects[x, y], nextFallingObjects);
                     } 
                     if (world.Grid[x, y] == Tile.Gem)
                     {
-                        gemLogic.Update(world, x, y);
+                        gemLogic.Update(world, entityManager, x, y, fallingObjects[x, y], nextFallingObjects);
                     }
                 }
             }
+            fallingObjects = nextFallingObjects;
         }
     }
 }

@@ -15,6 +15,18 @@ namespace BoulderDashSnilku.Entities
             entities.Add(entity);
         }
 
+        public void Remove(Entity entity)
+        {
+            if (entities.Contains(entity))
+            {
+                entities.Remove(entity);
+            }
+            else
+            {
+                throw new ArgumentException("Entity not found in the manager.");
+            }
+        }
+
         public Entity GetEntityAt(int x, int y)
         {
             foreach (Entity entity in entities)
