@@ -12,6 +12,7 @@ namespace BoulderDashSnilku.Core;
 public class Game1 : Game
 {
     private GameWorld world;
+    private LevelState levelState;
     private EntityManager entityManager;
     private Player player;
 
@@ -39,6 +40,7 @@ public class Game1 : Game
         player = new Player(2, 4);
         entityManager.Add(player);
 
+        levelState = new LevelState(17, 10);
         playerLogic = new PlayerLogic();
         worldSimulation = new WorldSimulation();
         _input = new InputManager();
@@ -61,7 +63,7 @@ public class Game1 : Game
         _input.Update(gameTime);
 
         MoveDirection direction = _input.GetMoveDirection();
-        playerLogic.Update(player, world, entityManager, direction);
+        playerLogic.Update(player, world, entityManager, levelState, direction);
 
         worldSimulation.Update(world, entityManager, gameTime);
 

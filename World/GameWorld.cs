@@ -37,6 +37,10 @@ namespace BoulderDashSnilku.World
             Grid[4, 7] = Tile.Gem;
             Grid[3, 8] = Tile.Gem;
             Grid[2, 9] = Tile.Gem;
+            for (int i = 2; i < 32; i++)
+            {
+                Grid[i, 11] = Tile.Gem;
+            }
             Grid[5, 5] = Tile.Boulder;
             Grid[5, 6] = Tile.Boulder;
             Grid[6, 7] = Tile.Boulder;

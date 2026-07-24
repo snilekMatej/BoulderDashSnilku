@@ -12,7 +12,7 @@ namespace BoulderDashSnilku.Simulation
 {
     public class PlayerLogic
     {
-        public void Update(Player player, GameWorld world, EntityManager entities, MoveDirection direction)
+        public void Update(Player player, GameWorld world, EntityManager entities, LevelState levelState, MoveDirection direction)
         {
             int targetX = player.x;
             int targetY = player.y;
@@ -60,6 +60,7 @@ namespace BoulderDashSnilku.Simulation
             if (targetTile == Tile.Gem)
             {
                 world.Grid[targetX, targetY] = Tile.Empty;
+                levelState.CollectGem(world);
                 // future: Score++;
             }
 
