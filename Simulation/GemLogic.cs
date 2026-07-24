@@ -13,12 +13,14 @@ namespace BoulderDashSnilku.Simulation
         public void Update(GameWorld world, EntityManager entityManager, int x, int y, bool gemFalling, bool[,] nextFallingObjects)
         {
             bool entityBellow = entityManager.HasEntityAt(x, y + 1);
+            Tile tileBellow = world.Grid[x, y + 1];
             nextFallingObjects[x, y] = false;
-            if (world.Grid[x, y + 1] == Tile.Empty)
+            if (tileBellow == Tile.Empty)
             {
-                if (entityBellow && !gemFalling)
+                // I will fall :|
+                if (!entityBellow && !gemFalling)
                 {
-                    return;
+                    nextFallingObjects[x, y] = true;
                 }
                 else if (entityBellow && gemFalling)
                 {
@@ -34,6 +36,24 @@ namespace BoulderDashSnilku.Simulation
                 {
                     world.Grid[x, y + 1] = Tile.Gem;
                     nextFallingObjects[x, y + 1] = true;
+                    world.Grid[x, y] = Tile.Empty;
+                }
+            }
+            else if (tileBellow == Tile.Wall || tileBellow == Tile.Boulder || tileBellow == Tile.Gem)
+            {
+                // I might roll off :)
+                // roll off right
+                if (x < world.Width - 1 && world.Grid[x + 1, y] == Tile.Empty && world.Grid[x + 1, y + 1] == Tile.Empty && !entityManager.HasEntityAt(x + 1, y) && !entityManager.HasEntityAt(x + 1, y + 1))
+                {
+                    world.Grid[x + 1, y] = Tile.Gem;
+                    nextFallingObjects[x + 1, y] = false;
+                    world.Grid[x, y] = Tile.Empty;
+                }
+                // roll off left
+                else if (x > 0 && world.Grid[x - 1, y] == Tile.Empty && world.Grid[x - 1, y + 1] == Tile.Empty && !entityManager.HasEntityAt(x - 1, y) && !entityManager.HasEntityAt(x - 1, y + 1))
+                {
+                    world.Grid[x - 1, y] = Tile.Gem;
+                    nextFallingObjects[x - 1, y] = true;
                     world.Grid[x, y] = Tile.Empty;
                 }
             }

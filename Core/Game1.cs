@@ -61,7 +61,7 @@ public class Game1 : Game
         _input.Update(gameTime);
 
         MoveDirection direction = _input.GetMoveDirection();
-        playerLogic.Update(player, world, direction);
+        playerLogic.Update(player, world, entityManager, direction);
 
         worldSimulation.Update(world, entityManager, gameTime);
 

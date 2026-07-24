@@ -18,9 +18,9 @@ namespace BoulderDashSnilku.Simulation
             if (tileBellow == Tile.Empty)
             {
                 // I will fall :|
-                if (entityBellow && !boulderFalling)
+                if (!entityBellow && !boulderFalling)
                 {
-                    return;
+                    nextFallingObjects[x, y] = true;
                 }
                 else if (entityBellow && boulderFalling)
                 {
@@ -42,16 +42,18 @@ namespace BoulderDashSnilku.Simulation
             else if (tileBellow == Tile.Wall || tileBellow == Tile.Boulder || tileBellow == Tile.Gem)
             {
                 // I might roll off :)
-                if (x < world.Width - 1)
+                // roll off right
+                if (x < world.Width - 1 && world.Grid[x + 1, y] == Tile.Empty && world.Grid[x + 1, y + 1] == Tile.Empty && !entityManager.HasEntityAt(x + 1, y) && !entityManager.HasEntityAt(x + 1, y + 1))
                 {
                     world.Grid[x + 1, y] = Tile.Boulder;
-                    nextFallingObjects[x + 1, y] = true;
+                    nextFallingObjects[x + 1, y] = false;
                     world.Grid[x, y] = Tile.Empty;
                 }
-                else if (world.Grid[x - 1, y] == Tile.Empty && world.Grid[x - 1, y + 1] == Tile.Empty)
+                // roll off left
+                else if (x > 0 && world.Grid[x - 1, y] == Tile.Empty && world.Grid[x - 1, y + 1] == Tile.Empty && !entityManager.HasEntityAt(x - 1, y) && !entityManager.HasEntityAt(x - 1, y + 1))
                 {
-                    world.Grid[x - 1, y + 1] = Tile.Boulder;
-                    nextFallingObjects[x - 1, y + 1] = true;
+                    world.Grid[x - 1, y] = Tile.Boulder;
+                    nextFallingObjects[x - 1, y] = true;
                     world.Grid[x, y] = Tile.Empty;
                 }
             }

@@ -12,7 +12,7 @@ namespace BoulderDashSnilku.Simulation
 {
     public class PlayerLogic
     {
-        public void Update(Player player, GameWorld world, MoveDirection direction)
+        public void Update(Player player, GameWorld world, EntityManager entities, MoveDirection direction)
         {
             int targetX = player.x;
             int targetY = player.y;
@@ -35,7 +35,7 @@ namespace BoulderDashSnilku.Simulation
                 default:
                     return;
             }
-            // Temporary / safety to not let player move off screen.
+            // Safety to not let player move off screen.
             if ((targetX < 0 || targetX >= world.Width) || (targetY < 0 || targetY >= world.Height))
             {
                 return;
@@ -48,7 +48,10 @@ namespace BoulderDashSnilku.Simulation
             }
             if (targetTile == Tile.Boulder)
             {
-                return; // Future: Push boulder logic
+                if (!TryPushBoulder(world, entities, direction, targetX, targetY))
+                {
+                    return;
+                }
             }
             if (targetTile == Tile.Dirt)
             {
@@ -61,6 +64,32 @@ namespace BoulderDashSnilku.Simulation
             }
 
             player.MoveTo(targetX, targetY);
+        }
+
+        private bool TryPushBoulder(GameWorld world, EntityManager entities, MoveDirection direction, int boulderX, int boulderY)
+        {
+            int destinationX = boulderX;
+            int destinationY = boulderY;
+
+            switch (direction)
+            {
+                case MoveDirection.Left:
+                    destinationX--;
+                    break;
+                case MoveDirection.Right:
+                    destinationX++;
+                    break;
+                default:
+                    return false;
+            }
+            if (world.Grid[destinationX, destinationY] != Tile.Empty || entities.HasEntityAt(destinationX, destinationY))
+            {
+                return false;
+            }
+            world.Grid[destinationX, destinationY] = Tile.Boulder;
+            world.Grid[boulderX, boulderY] = Tile.Empty;
+
+            return true;
         }
     }
 }
