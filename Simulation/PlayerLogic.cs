@@ -35,6 +35,15 @@ namespace BoulderDashSnilku.Simulation
                 default:
                     return;
             }
+            // entities
+            Entity? targetEntity = entities.GetEntityAt(targetX, targetY);
+
+            if (targetEntity is Firefly)
+            {
+                player.Kill();
+                entities.Remove(player);
+                return;
+            }
             // Safety to not let player move off screen.
             if ((targetX < 0 || targetX >= world.Width) || (targetY < 0 || targetY >= world.Height))
             {

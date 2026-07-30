@@ -10,12 +10,12 @@ B--O-WW--O-OO---W----O-OO------W--O-W-OB
 B--W---G------G-O--WWO--O-W-WO--WO--G-OB
 BO-O----W-WW--G-O--WWO--O--G-W---W--O-WB
 B-O-WW-----OOWO--G-W-WO--WO---WO--G-O--B
-BW-WW------OOWO--O-W-WW---W--O-Ww--O-WWB
+BW-WW------OOWO--O-W-WW---W--O-WW--O-WWB
 B-W-O-O-W---WWO--O----W---O-----WW-O-WWB
 B-W-O-O-W-G-W-WO--WO----O--O-OO----W---B
-BW--WOWO--O----W---G---W-OW------w-Ww-GB
+BW--WOWO--O----W---G---W-OW------W-WW-GB
 BW---WWO--W-G---WO--O-O---O-WO------W--B
-BW-G----O-WW--O-WWO-------O-WO------w--B
+BW-G----O-WW--O-WWO-------O-WO------W--B
 B--O----W---O------O-OO------W--O-W---WB
 BO-WW--O-WW---W----O-OO------W--OG--O--E
 BW---O------O-OG------O---WW--WO--G-W--B

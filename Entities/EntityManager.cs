@@ -43,5 +43,10 @@ namespace BoulderDashSnilku.Entities
         {
             return GetEntityAt(x, y) != null;
         }
+        
+        public IEnumerable<T> GetEntities<T>() where T : Entity
+        {
+            return entities.OfType<T>();
+        }
     }
 }

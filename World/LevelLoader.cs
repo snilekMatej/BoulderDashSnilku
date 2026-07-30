@@ -32,6 +32,8 @@ namespace BoulderDashSnilku.World
             int exitX = -1;
             int exitY = -1;
 
+            EntityManager entityManager = new EntityManager();
+
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -60,6 +62,12 @@ namespace BoulderDashSnilku.World
                             break;
                         case 'P':
                             player = new Player(x, y);
+                            entityManager.Add(player);
+                            world.Grid[x, y] = Tile.Empty;
+                            break;
+                        case 'H':
+                            Firefly firefly = new Firefly(x, y);
+                            entityManager.Add(firefly);
                             world.Grid[x, y] = Tile.Empty;
                             break;
                         case 'E':
@@ -87,7 +95,7 @@ namespace BoulderDashSnilku.World
 
             LevelState levelState = new LevelState(exitX, exitY, gemQuota);
 
-            return new LoadedLevel(world, player, levelState);
+            return new LoadedLevel(world, player, levelState, entityManager);
         }
         private static int ParseGemQuota(string line)
         {

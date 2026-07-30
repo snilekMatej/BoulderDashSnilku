@@ -13,12 +13,13 @@ namespace BoulderDashSnilku.Simulation
     {
         private double _accumulator = 0;
         private const double StepTime = 0.125;
+        private const double EnemyStepTime = 0.375;
 
         private BoulderLogic boulderLogic = new BoulderLogic();
         private GemLogic gemLogic = new GemLogic();
-        private bool[,] fallingObjects;
+        private FireflyLogic fireflyLogic = new FireflyLogic();
 
-        private EntityManager entityManager = new EntityManager();
+        private bool[,] fallingObjects;
         public void Update(GameWorld world, EntityManager entityManager, GameTime gameTime)
         {
             _accumulator += gameTime.ElapsedGameTime.TotalSeconds;
@@ -46,6 +47,19 @@ namespace BoulderDashSnilku.Simulation
                     if (world.Grid[x, y] == Tile.Gem)
                     {
                         gemLogic.Update(world, entityManager, x, y, fallingObjects[x, y], nextFallingObjects);
+                    }
+                }
+            }
+            
+            foreach (Firefly firefly in entityManager.GetEntities<Firefly>().ToList())
+            {
+                if (firefly.IsAlive)
+                {
+                    firefly.MoveTimer++;
+                    if (firefly.MoveTimer >= 3)
+                    {
+                        firefly.MoveTimer = 0;
+                        fireflyLogic.Update(firefly, world, entityManager);
                     }
                 }
             }

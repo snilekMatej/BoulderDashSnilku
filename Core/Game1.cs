@@ -115,7 +115,15 @@ public class Game1 : Game
             }
         }
         // Draw PLayer
-        _spriteBatch.Draw(pixel, new Rectangle(player.x * TileSize, player.y * TileSize, TileSize, TileSize), player.isAlive ? Color.Cyan : Color.Red);
+        _spriteBatch.Draw(pixel, new Rectangle(player.x * TileSize, player.y * TileSize, TileSize, TileSize), player.IsAlive ? Color.Cyan : Color.Red);
+        foreach (Firefly firefly in entityManager.GetEntities<Firefly>())
+        {
+            if (!firefly.IsAlive)
+            {
+                continue;
+            }
+            _spriteBatch.Draw(pixel, new Rectangle(firefly.x * TileSize, firefly.y * TileSize, TileSize, TileSize), Color.Purple);
+        }
 
         _spriteBatch.End();
         base.Draw(gameTime);
@@ -132,8 +140,6 @@ public class Game1 : Game
         world = loadedLevel.World;
         player = loadedLevel.Player;
         levelState = loadedLevel.LevelState;
-
-        entityManager = new EntityManager();
-        entityManager.Add(player);
+        entityManager = loadedLevel.EntityManager;
     }
 }

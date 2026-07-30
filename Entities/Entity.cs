@@ -10,7 +10,7 @@ namespace BoulderDashSnilku.Entities
     {
         public int x { get; protected set; }
         public int y { get; protected set; }
-        public bool isAlive { get; protected set; } = true;
+        public bool IsAlive { get; protected set; } = true;
 
         protected Entity(int x, int y)
         {
@@ -26,7 +26,7 @@ namespace BoulderDashSnilku.Entities
         public void Kill()
         {
             // This method can be used to remove the entity from the game world or mark it as dead.
-            isAlive = false;
+            IsAlive = false;
         }
     }
 }

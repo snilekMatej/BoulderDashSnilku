@@ -13,7 +13,7 @@ BO--O---W----O--W--O.---W------GWO-----B
 BO----O-W--O--O-W---.-.OW-------WO---O-B
 B-O-----W---O---W---.-.OW-------W.O--O-B
 BWWWWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWWWB
-BO-..?--W----O-OW---.---W-OG--O-W------B
+BO-..H--W----O-OW---.---W-OG--O-W------B
 B-----O-WO------W--G.---W.--O---W-O-OO-B
 B......................................B
 BG----O-WO----O-W-O-.--OW-O-O---W------B
