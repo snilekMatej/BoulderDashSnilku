@@ -42,26 +42,27 @@ namespace BoulderDashSnilku.Simulation
             }
             Tile targetTile = world.Grid[targetX, targetY];
             // colisions:
-            if (targetTile == Tile.Wall || targetTile == Tile.Border)
+            switch (targetTile)
             {
-                return;
-            }
-            if (targetTile == Tile.Boulder)
-            {
-                if (!TryPushBoulder(world, entities, direction, targetX, targetY))
-                {
+                case Tile.Wall or Tile.Border:
                     return;
-                }
-            }
-            if (targetTile == Tile.Dirt)
-            {
-                world.Grid[targetX, targetY] = Tile.Empty;
-            }
-            if (targetTile == Tile.Gem)
-            {
-                world.Grid[targetX, targetY] = Tile.Empty;
-                levelState.CollectGem(world);
-                // future: Score++;
+                case Tile.Boulder:
+                    if (!TryPushBoulder(world, entities, direction, targetX, targetY))
+                    {
+                        return;
+                    }
+                    break;
+                case Tile.Dirt:
+                    world.Grid[targetX, targetY] = Tile.Empty;
+                    break;
+                case Tile.Gem:
+                    world.Grid[targetX, targetY] = Tile.Empty;
+                    levelState.CollectGem(world);
+                    // future: score++;
+                    break;
+                case Tile.Exit:
+                    levelState.CompleteLevel();
+                    break;
             }
 
             player.MoveTo(targetX, targetY);

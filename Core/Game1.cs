@@ -6,12 +6,18 @@ using BoulderDashSnilku.Simulation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.IO;
 
 namespace BoulderDashSnilku.Core;
 
 public class Game1 : Game
 {
+    private const int PixelScale = 2;
+    private const int TileSize = 16;
+
     private GameWorld world;
+    private int currentLevel = 0;
     private LevelState levelState;
     private EntityManager entityManager;
     private Player player;
@@ -33,17 +39,16 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
-        world = new GameWorld();
-        entityManager = new EntityManager();
-        
-        player = new Player(2, 4);
-        entityManager.Add(player);
+        currentLevel = 0;
+        LoadLevel(currentLevel);
 
-        levelState = new LevelState(17, 10);
         playerLogic = new PlayerLogic();
         worldSimulation = new WorldSimulation();
         _input = new InputManager();
+
+        _graphics.PreferredBackBufferWidth = world.Width * TileSize * PixelScale;
+        _graphics.PreferredBackBufferHeight = world.Height * TileSize * PixelScale;
+        _graphics.ApplyChanges();
 
         base.Initialize();
     }
@@ -65,12 +70,18 @@ public class Game1 : Game
         MoveDirection direction = _input.GetMoveDirection();
         playerLogic.Update(player, world, entityManager, levelState, direction);
 
-        worldSimulation.Update(world, entityManager, gameTime);
+        if (levelState.IsCompleted)
+        {
+            currentLevel++;
+            LoadLevel(currentLevel);
+        }
+        else
+        {
+            worldSimulation.Update(world, entityManager, gameTime);
+        }
 
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
-
-        // TODO: Add your update logic here
 
         base.Update(gameTime);
     }
@@ -79,9 +90,9 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.Black);
 
-        _spriteBatch.Begin();
-
-        int TileSize = 16;
+        _spriteBatch.Begin(
+            samplerState: SamplerState.PointClamp,
+            transformMatrix: Matrix.CreateScale(PixelScale));
 
         // Draw World
         for (int y = 0; y < world.Height; y++)
@@ -108,5 +119,21 @@ public class Game1 : Game
 
         _spriteBatch.End();
         base.Draw(gameTime);
+    }
+
+
+    private void LoadLevel(int levelNumber)
+    {
+        string fileName = $"Level{levelNumber:D2}.txt";
+        string levelPath = Path.Combine(AppContext.BaseDirectory, "Content", "Levels", fileName);
+
+        LoadedLevel loadedLevel = LevelLoader.Load(levelPath);
+
+        world = loadedLevel.World;
+        player = loadedLevel.Player;
+        levelState = loadedLevel.LevelState;
+
+        entityManager = new EntityManager();
+        entityManager.Add(player);
     }
 }

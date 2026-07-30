@@ -18,13 +18,13 @@ namespace BoulderDashSnilku.World
         public int GemQuota { get; }
 
         public bool IsExitOpen { get; private set; }
+        public bool IsCompleted { get; private set; }
 
-        public LevelState(int exitX, int exitY)
+        public LevelState(int exitX, int exitY, int gemQuota)
         {
             this.exitX = exitX;
             this.exitY = exitY;
-
-            GemQuota = DefaultGemQuota;
+            GemQuota = gemQuota;
         }
         public void CollectGem(GameWorld world)
         {
@@ -39,6 +39,10 @@ namespace BoulderDashSnilku.World
         {
             world.Grid[exitX, exitY] = Tile.Exit;
             IsExitOpen = true;
+        }
+        public void CompleteLevel()
+        {
+            IsCompleted = true;
         }
     }
 }
