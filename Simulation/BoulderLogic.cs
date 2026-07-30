@@ -10,14 +10,13 @@ namespace BoulderDashSnilku.Simulation
 {
     public class BoulderLogic
     {
-        public void Update(GameWorld world, EntityManager entityManager, int x, int y, bool boulderFalling, bool[,] nextFallingObjects)
+        public void Update(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic, int x, int y, bool boulderFalling, bool[,] nextFallingObjects)
         {
             bool entityBellow = entityManager.HasEntityAt(x, y + 1);
             Tile tileBellow = world.Grid[x, y + 1];
             nextFallingObjects[x, y] = false;
             if (tileBellow == Tile.Empty)
             {
-                // I will fall :|
                 if (!entityBellow && !boulderFalling)
                 {
                     nextFallingObjects[x, y] = true;
@@ -25,12 +24,11 @@ namespace BoulderDashSnilku.Simulation
                 else if (entityBellow && boulderFalling)
                 {
                     Entity entity = entityManager.GetEntityAt(x, y + 1);
-                    entity.Kill();
-                    entityManager.Remove(entity);
-
-                    world.Grid[x, y + 1] = Tile.Boulder;
-                    nextFallingObjects[x, y + 1] = true;
-                    world.Grid[x, y] = Tile.Empty;
+                    entity.Kill(world, entityManager, explosionLogic);
+                    return;
+                    //world.Grid[x, y + 1] = Tile.Boulder;
+                    //nextFallingObjects[x, y + 1] = true;
+                    //world.Grid[x, y] = Tile.Empty;
                 }
                 else if (!entityBellow)
                 {
@@ -41,15 +39,12 @@ namespace BoulderDashSnilku.Simulation
             }
             else if (tileBellow == Tile.Wall || tileBellow == Tile.Boulder || tileBellow == Tile.Gem)
             {
-                // I might roll off :)
-                // roll off right
                 if (x < world.Width - 1 && world.Grid[x + 1, y] == Tile.Empty && world.Grid[x + 1, y + 1] == Tile.Empty && !entityManager.HasEntityAt(x + 1, y) && !entityManager.HasEntityAt(x + 1, y + 1))
                 {
                     world.Grid[x + 1, y] = Tile.Boulder;
                     nextFallingObjects[x + 1, y] = false;
                     world.Grid[x, y] = Tile.Empty;
                 }
-                // roll off left
                 else if (x > 0 && world.Grid[x - 1, y] == Tile.Empty && world.Grid[x - 1, y + 1] == Tile.Empty && !entityManager.HasEntityAt(x - 1, y) && !entityManager.HasEntityAt(x - 1, y + 1))
                 {
                     world.Grid[x - 1, y] = Tile.Boulder;

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using BoulderDashSnilku.Library;
+using BoulderDashSnilku.Simulation;
+using BoulderDashSnilku.World;
 
 namespace BoulderDashSnilku.Entities
 {
@@ -15,6 +17,17 @@ namespace BoulderDashSnilku.Entities
         public Firefly(int x, int y) : base(x, y)
         {
             Direction = Direction.Up;
+        }
+
+        public override void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
+        {
+            if (!IsAlive)
+            {
+                return;
+            }
+            IsAlive = false;
+
+            explosionLogic.Explode(this, world, entityManager, ExplosionResult.Gems);
         }
     }
 }

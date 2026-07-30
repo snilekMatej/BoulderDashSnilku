@@ -12,7 +12,7 @@ namespace BoulderDashSnilku.Simulation
 {
     public class PlayerLogic
     {
-        public void Update(Player player, GameWorld world, EntityManager entities, LevelState levelState, MoveDirection direction)
+        public void Update(Player player, GameWorld world, EntityManager entities, LevelState levelState, MoveDirection direction, ExplosionLogic explosionLogic)
         {
             int targetX = player.x;
             int targetY = player.y;
@@ -40,8 +40,7 @@ namespace BoulderDashSnilku.Simulation
 
             if (targetEntity is Firefly)
             {
-                player.Kill();
-                entities.Remove(player);
+                player.Kill(world, entities, explosionLogic);
                 return;
             }
             // Safety to not let player move off screen.

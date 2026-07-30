@@ -3,14 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BoulderDashSnilku.Library;
 using BoulderDashSnilku.Simulation;
 using BoulderDashSnilku.World;
 
 namespace BoulderDashSnilku.Entities
 {
-    public class Player : Entity
+    public class Butterfly : Entity
     {
-        public Player(int x, int y) : base(x, y) { }
+        public Direction Direction { get; set; }
+        public int MoveTimer { get; set; } = 0;
+        public Butterfly(int x, int y) : base(x, y)
+        {
+            Direction = Direction.Up;
+        }
 
         public override void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
         {
@@ -20,7 +26,7 @@ namespace BoulderDashSnilku.Entities
             }
             IsAlive = false;
 
-            explosionLogic.Explode(this, world, entityManager, ExplosionResult.Empty);
+            explosionLogic.Explode(this, world, entityManager, ExplosionResult.Gems);
         }
     }
 }

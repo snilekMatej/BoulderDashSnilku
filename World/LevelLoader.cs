@@ -70,6 +70,11 @@ namespace BoulderDashSnilku.World
                             entityManager.Add(firefly);
                             world.Grid[x, y] = Tile.Empty;
                             break;
+                        case 'X':
+                            Butterfly butterfly = new Butterfly(x, y);
+                            entityManager.Add(butterfly);
+                            world.Grid[x, y] = Tile.Empty;
+                            break;
                         case 'E':
                             exitX = x;
                             exitY = y;

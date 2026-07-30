@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,35 +11,35 @@ using BoulderDashSnilku.World;
 
 namespace BoulderDashSnilku.Simulation
 {
-    public class FireflyLogic
+    public class ButterflyLogic
     {
         private readonly GameWorld world;
         private readonly EntityManager entityManager;
 
-        public void Update(Firefly firefly, GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
+        public void Update(Butterfly butterfly, GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
         {
-            Direction left = firefly.Direction.TurnLeft();
+            Direction right = butterfly.Direction.TurnRight();
 
-            if (CanMove(firefly, left, world, entityManager))
+            if (CanMove(butterfly, right, world, entityManager))
             {
-                firefly.Direction = left;
-                Move(firefly, left, world, entityManager, explosionLogic);
+                butterfly.Direction = right;
+                Move(butterfly, right, world, entityManager, explosionLogic);
             }
-            else if (CanMove(firefly, firefly.Direction, world, entityManager))
+            else if (CanMove(butterfly, butterfly.Direction, world, entityManager))
             {
-                Move(firefly, firefly.Direction, world, entityManager, explosionLogic);
+                Move(butterfly, butterfly.Direction, world, entityManager, explosionLogic);
             }
             else
             {
-                firefly.Direction = firefly.Direction.TurnRight();
+                butterfly.Direction = butterfly.Direction.TurnLeft();
             }
         }
-        private bool CanMove(Firefly firefly, Direction direction, GameWorld world, EntityManager entityManager)
+        private bool CanMove(Butterfly butterfly, Direction direction, GameWorld world, EntityManager entityManager)
         {
             (int offsetX, int offsetY) = direction.GetOffset();
 
-            int targetX = firefly.x + offsetX;
-            int targetY = firefly.y + offsetY;
+            int targetX = butterfly.x + offsetX;
+            int targetY = butterfly.y + offsetY;
 
             if (targetX < 0 || targetX >= world.Width || targetY < 0 || targetY >= world.Height)
             {
@@ -60,11 +59,11 @@ namespace BoulderDashSnilku.Simulation
             }
             return true;
         }
-        private void Move(Firefly firefly, Direction direction, GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
+        private void Move(Butterfly butterfly, Direction direction, GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
         {
             (int offsetX, int offsetY) = direction.GetOffset();
-            int targetX = firefly.x + offsetX;
-            int targetY = firefly.y + offsetY;
+            int targetX = butterfly.x + offsetX;
+            int targetY = butterfly.y + offsetY;
 
             Entity? targetEntity = entityManager.GetEntityAt(targetX, targetY);
 
@@ -73,7 +72,7 @@ namespace BoulderDashSnilku.Simulation
                 player.Kill(world, entityManager, explosionLogic);
                 return;
             }
-            firefly.MoveTo(targetX, targetY);
+            butterfly.MoveTo(targetX, targetY);
         }
 
     }

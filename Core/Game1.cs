@@ -17,12 +17,14 @@ public class Game1 : Game
     private const int TileSize = 16;
 
     private GameWorld world;
-    private int currentLevel = 0;
+    private int currentLevel;
     private LevelState levelState;
     private EntityManager entityManager;
     private Player player;
 
     private PlayerLogic playerLogic;
+    private ExplosionLogic explosionLogic;
+
     private WorldSimulation worldSimulation;
     private InputManager _input;
 
@@ -39,10 +41,12 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        currentLevel = 0;
+        currentLevel = 4; // set to 0!
         LoadLevel(currentLevel);
 
         playerLogic = new PlayerLogic();
+        explosionLogic = new ExplosionLogic();
+
         worldSimulation = new WorldSimulation();
         _input = new InputManager();
 
@@ -68,7 +72,7 @@ public class Game1 : Game
         _input.Update(gameTime);
 
         MoveDirection direction = _input.GetMoveDirection();
-        playerLogic.Update(player, world, entityManager, levelState, direction);
+        playerLogic.Update(player, world, entityManager, levelState, direction, explosionLogic);
 
         if (levelState.IsCompleted)
         {
@@ -123,6 +127,14 @@ public class Game1 : Game
                 continue;
             }
             _spriteBatch.Draw(pixel, new Rectangle(firefly.x * TileSize, firefly.y * TileSize, TileSize, TileSize), Color.Purple);
+        }
+        foreach (Butterfly butterfly in entityManager.GetEntities<Butterfly>())
+        {
+            if (!butterfly.IsAlive)
+            {
+                continue;
+            }
+            _spriteBatch.Draw(pixel, new Rectangle(butterfly.x * TileSize, butterfly.y * TileSize, TileSize, TileSize), Color.Orange);
         }
 
         _spriteBatch.End();

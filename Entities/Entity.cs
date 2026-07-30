@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BoulderDashSnilku.Simulation;
+using BoulderDashSnilku.World;
 
 namespace BoulderDashSnilku.Entities
 {
@@ -23,9 +25,13 @@ namespace BoulderDashSnilku.Entities
             this.y = y;
         }
 
-        public void Kill()
+        public virtual void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
         {
-            // This method can be used to remove the entity from the game world or mark it as dead.
+            if (!IsAlive)
+            {
+                return;
+            }
+
             IsAlive = false;
         }
     }
