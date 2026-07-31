@@ -26,9 +26,6 @@ namespace BoulderDashSnilku.Simulation
                     Entity entity = entityManager.GetEntityAt(x, y + 1);
                     entity.Kill(world, entityManager, explosionLogic);
                     return;
-                    //world.Grid[x, y + 1] = Tile.Boulder;
-                    //nextFallingObjects[x, y + 1] = true;
-                    //world.Grid[x, y] = Tile.Empty;
                 }
                 else if (!entityBellow)
                 {
