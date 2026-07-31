@@ -36,6 +36,10 @@ public class Game1 : Game
     private HudRenderer hudRenderer;
 
     private GameplayController gameplayController;
+
+    private GameState gameState;
+    private KeyboardState previousKeyboardState;
+
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private Texture2D pixel;
@@ -49,7 +53,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        currentLevel = 0; // set to 0!
+        currentLevel = 0;
         gameSession = new GameSession();
 
         playerLogic = new PlayerLogic();
@@ -59,6 +63,8 @@ public class Game1 : Game
         _input = new InputManager();
 
         gameplayController = new GameplayController();
+        gameState = GameState.StartScreen;
+
         LoadLevel(currentLevel);
 
         _graphics.PreferredBackBufferWidth = world.Width * TileSize * PixelScale;
@@ -83,6 +89,47 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
+        KeyboardState currentKeyboardState = Keyboard.GetState();
+
+        if (gameState == GameState.StartScreen)
+        {
+            bool enterPressed = currentKeyboardState.IsKeyDown(Keys.Enter) && previousKeyboardState.IsKeyUp(Keys.Enter);
+
+            if (enterPressed)
+            {
+                currentLevel = 0;
+                gameSession = new GameSession();
+
+                LoadLevel(currentLevel);
+                gameState = GameState.Gameplay;
+            }
+            previousKeyboardState = currentKeyboardState;
+
+            if (currentKeyboardState.IsKeyDown(Keys.Escape))
+            {
+                Exit();
+            }
+            base.Update(gameTime);
+            return;
+        }
+        if (gameState == GameState.EndScreen)
+        {
+            bool enterPressed = currentKeyboardState.IsKeyDown(Keys.Enter) && previousKeyboardState.IsKeyUp(Keys.Enter);
+
+            if (enterPressed)
+            {
+                gameState = GameState.StartScreen;
+            }
+            previousKeyboardState = currentKeyboardState;
+
+            if (currentKeyboardState.IsKeyDown(Keys.Escape))
+            {
+                Exit();
+            }
+            base.Update(gameTime);
+            return;
+        }
+
         _input.Update(gameTime);
 
         bool restartLevel = gameplayController.Update(gameTime, player);
@@ -122,7 +169,10 @@ public class Game1 : Game
                 gameSession.Score += levelState.TimeLeft;
 
                 currentLevel++;
-                LoadLevel(currentLevel);
+                if (!LoadLevel(currentLevel))
+                {
+                    gameState = GameState.EndScreen;
+                }
             }
             else
             {
@@ -132,6 +182,8 @@ public class Game1 : Game
 
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+
+        previousKeyboardState = currentKeyboardState;
 
         base.Update(gameTime);
     }
@@ -143,6 +195,23 @@ public class Game1 : Game
         _spriteBatch.Begin(
             samplerState: SamplerState.PointClamp,
             transformMatrix: Matrix.CreateScale(PixelScale));
+
+        if (gameState == GameState.StartScreen)
+        {
+            DrawStartScreen();
+
+            _spriteBatch.End();
+            base.Draw(gameTime);
+            return;
+        }
+        if (gameState == GameState.EndScreen)
+        {
+            DrawEndScreen();
+
+            _spriteBatch.End();
+            base.Draw(gameTime);
+            return;
+        }
 
         // Draw World
         for (int y = 0; y < world.Height; y++)
@@ -188,12 +257,65 @@ public class Game1 : Game
         _spriteBatch.End();
         base.Draw(gameTime);
     }
+    private void DrawStartScreen()
+    {
+        const string title = "BOULDER     DASH";
+        const string instruction = "PRESS     ENTER     TO     START";
+
+        Vector2 titleSise = hudFont.MeasureString(title);
+        Vector2 instructionSize = hudFont.MeasureString(instruction);
+
+        float logicalScreenWidth = _graphics.PreferredBackBufferWidth / PixelScale;
+        float logicalScreenHeight = _graphics.PreferredBackBufferHeight / PixelScale;
+
+        Vector2 titlePosition = new Vector2((logicalScreenWidth - titleSise.X) / 2, logicalScreenHeight / 2 - 24);
+        Vector2 instructionPosition = new Vector2((logicalScreenWidth - instructionSize.X) / 2, logicalScreenHeight / 2 + 8);
+
+        _spriteBatch.DrawString(hudFont, title, titlePosition, Color.White);
+        _spriteBatch.DrawString(hudFont, instruction, instructionPosition, Color.White);
+    }
+    private void DrawEndScreen()
+    {
+        const int boxWidth = 260;
+        const int boxHeight = 120;
+
+        float logicalWidth = _graphics.PreferredBackBufferWidth / PixelScale;
+        float logicalHeight = _graphics.PreferredBackBufferHeight / PixelScale;
+
+        int boxX = (int)((logicalWidth - boxWidth) / 2);
+        int boxY = (int)((logicalHeight - boxHeight) / 2);
+
+        Rectangle box = new Rectangle(boxX, boxY, boxWidth, boxHeight);
+
+        _spriteBatch.Draw(pixel, box, Color.DarkBlue);
+
+        const string title = "YOU     WIN!";
+        string scoreText = $"YOUR     SCORE     IS     {gameSession.Score:D5}";
+        const string thanks = "THANKS     FOR     PLAYING!!!";
+
+        DrawCenteredText(title, boxY + 18, logicalWidth, Color.White);
+        DrawCenteredText(scoreText, boxY + 50, logicalWidth, Color.White);
+        DrawCenteredText(thanks, boxY + 82, logicalWidth, Color.White);
+    }
+
+    private void DrawCenteredText(string text, float y, float screenWidth, Color color)
+    {
+        Vector2 textSize = hudFont.MeasureString(text);
+        Vector2 position = new Vector2((screenWidth - textSize.X) / 2, y);
+
+        _spriteBatch.DrawString(hudFont, text, position, color);
+    }
 
 
-    private void LoadLevel(int levelNumber)
+    private bool LoadLevel(int levelNumber)
     {
         string fileName = $"Level{levelNumber:D2}.txt";
         string levelPath = Path.Combine(AppContext.BaseDirectory, "Content", "Levels", fileName);
+
+        if (!File.Exists(levelPath))
+        {
+            return false;
+        }
 
         LoadedLevel loadedLevel = LevelLoader.Load(levelPath);
 
@@ -203,5 +325,6 @@ public class Game1 : Game
         entityManager = loadedLevel.EntityManager;
 
         gameplayController.StartLevel();
+        return true;
     }
 }
