@@ -1,4 +1,6 @@
 QUOTA=12
+GEMVALUE=10
+TIME=150
 BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
 B------.--G-O.-----O-O-------.----O----B
 B-OPO------.---------OG--O----.-----.--B

@@ -18,7 +18,9 @@ namespace BoulderDashSnilku.World
             string[] lines = File.ReadAllLines(filePath);
 
             int gemQuota = ParseGemQuota(lines[0]);
-            string[] mapLines = lines[1..];
+            int gemValue = ParseGemValue(lines[1]);
+            int time = ParseTime(lines[2]);
+            string[] mapLines = lines[3..];
 
             ValidateLevel(mapLines);
 
@@ -98,7 +100,7 @@ namespace BoulderDashSnilku.World
                     "The level doesn't contain an exit.");
             }
 
-            LevelState levelState = new LevelState(exitX, exitY, gemQuota);
+            LevelState levelState = new LevelState(exitX, exitY, gemQuota, gemValue, time);
 
             return new LoadedLevel(world, player, levelState, entityManager);
         }
@@ -117,6 +119,38 @@ namespace BoulderDashSnilku.World
                 throw new InvalidDataException($"Invalid gem quota '{quotaText}'.");
             }
             return quota;
+        }
+        private static int ParseGemValue(string line)
+        {
+            const string prefix = "GEMVALUE=";
+
+            if (!line.StartsWith(prefix))
+            {
+                throw new InvalidDataException($"The second line must use the format {prefix}<number>.");
+            }
+            string gemValueText = line[prefix.Length..];
+
+            if (!int.TryParse(gemValueText, out int gemValue) || gemValue < 0)
+            {
+                throw new InvalidDataException($"Invalid gem value '{gemValueText}'");
+            }
+            return gemValue;
+        }
+        private static int ParseTime(string line)
+        {
+            const string prefix = "TIME=";
+
+            if (!line.StartsWith(prefix))
+            {
+                throw new InvalidDataException($"The third line must use the format {prefix}<number>.");
+            }
+            string timeText = line[prefix.Length..];
+
+            if (!int.TryParse(timeText, out int time) || time < 0)
+            {
+                throw new InvalidDataException($"Invalid time remaining '{timeText}'");
+            }
+            return time;
         }
         private static void ValidateLevel(string[] lines)
         {

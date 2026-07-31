@@ -14,23 +14,27 @@ namespace BoulderDashSnilku.World
         private readonly int exitX;
         private readonly int exitY;
 
-        public int CollectedGems { get; private set; }
-        public int GemQuota { get; }
+        public int RequiredGems { get; set; }
+        public int GemValue { get; set; }
+        public int CollectedGems { get; set; }
+        public int TimeLeft { get; set; }
 
         public bool IsExitOpen { get; private set; }
         public bool IsCompleted { get; private set; }
 
-        public LevelState(int exitX, int exitY, int gemQuota)
+        public LevelState(int exitX, int exitY, int requiredGems, int gemValue, int timeLeft)
         {
             this.exitX = exitX;
             this.exitY = exitY;
-            GemQuota = gemQuota;
+            RequiredGems = requiredGems;
+            GemValue = gemValue;
+            TimeLeft = timeLeft;
         }
         public void CollectGem(GameWorld world)
         {
             CollectedGems++;
 
-            if (!IsExitOpen && CollectedGems >= GemQuota)
+            if (!IsExitOpen && CollectedGems >= RequiredGems)
             {
                 OpenExit(world);
             }

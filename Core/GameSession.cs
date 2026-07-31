@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BoulderDashSnilku.Rendering
+namespace BoulderDashSnilku.Core
 {
-    class Render
+    public class GameSession
     {
+        public int Score { get; set; } = 0;
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using BoulderDashSnilku.Core;
 using BoulderDashSnilku.Entities;
 using BoulderDashSnilku.Input;
 using BoulderDashSnilku.World;
@@ -12,7 +13,7 @@ namespace BoulderDashSnilku.Simulation
 {
     public class PlayerLogic
     {
-        public void Update(Player player, GameWorld world, EntityManager entities, LevelState levelState, MoveDirection direction, ExplosionLogic explosionLogic)
+        public void Update(Player player, GameWorld world, EntityManager entities, LevelState levelState, GameSession gameSession, MoveDirection direction, ExplosionLogic explosionLogic)
         {
             int targetX = player.x;
             int targetY = player.y;
@@ -66,7 +67,7 @@ namespace BoulderDashSnilku.Simulation
                 case Tile.Gem:
                     world.Grid[targetX, targetY] = Tile.Empty;
                     levelState.CollectGem(world);
-                    // future: score++;
+                    gameSession.Score += levelState.GemValue;
                     break;
                 case Tile.Exit:
                     levelState.CompleteLevel();

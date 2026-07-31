@@ -37,19 +37,18 @@ namespace BoulderDashSnilku.Simulation
 
         private void DestroyEntityAt(Entity source, int x, int y, GameWorld world, EntityManager entityManager)
         {
-            Entity target = entityManager.GetEntityAt(x, y);
+            Entity? target = entityManager.GetEntityAt(x, y);
 
             if (target == null || target == source)
             {
                 return;
             }
             target.Kill(world, entityManager, this);
-            entityManager.Remove(target);
         }
 
         private void ReplaceTile(GameWorld world, int x, int y, ExplosionResult result)
         {
-            if (world.Grid[x, y] == Tile.Border)
+            if (world.Grid[x, y] == Tile.Border || world.Grid[x, y] == Tile.Exit)
             {
                 return;
             }

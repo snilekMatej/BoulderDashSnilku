@@ -1,4 +1,6 @@
 QUOTA=36
+GEMVALUE=5
+TIME=120
 BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
 BP-----O--------------------O--------O-B
 B-----O--------------O-----------------B

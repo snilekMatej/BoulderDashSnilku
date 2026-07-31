@@ -1,4 +1,6 @@
 QUOTA=20
+GEMVALUE=1
+TIME=999
 BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
 B--------------------------------------B
 B--------------------------------------B
