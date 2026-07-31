@@ -10,45 +10,11 @@ namespace BoulderDashSnilku.Simulation
 {
     public class GemLogic
     {
+        private readonly FallingObjectLogic fallingObjectLogic = new FallingObjectLogic();
+
         public void Update(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic, int x, int y, bool gemFalling, bool[,] nextFallingObjects)
         {
-            bool entityBellow = entityManager.HasEntityAt(x, y + 1);
-            Tile tileBellow = world.Grid[x, y + 1];
-            nextFallingObjects[x, y] = false;
-            if (tileBellow == Tile.Empty)
-            {
-                if (!entityBellow && !gemFalling)
-                {
-                    nextFallingObjects[x, y] = true;
-                }
-                else if (entityBellow && gemFalling)
-                {
-                    Entity entity = entityManager.GetEntityAt(x, y + 1);
-                    entity.Kill(world, entityManager, explosionLogic);
-                    return;
-                }
-                else if (!entityBellow)
-                {
-                    world.Grid[x, y + 1] = Tile.Gem;
-                    nextFallingObjects[x, y + 1] = true;
-                    world.Grid[x, y] = Tile.Empty;
-                }
-            }
-            else if (tileBellow == Tile.Wall || tileBellow == Tile.Boulder || tileBellow == Tile.Gem)
-            {
-                if (x < world.Width - 1 && world.Grid[x + 1, y] == Tile.Empty && world.Grid[x + 1, y + 1] == Tile.Empty && !entityManager.HasEntityAt(x + 1, y) && !entityManager.HasEntityAt(x + 1, y + 1))
-                {
-                    world.Grid[x + 1, y] = Tile.Gem;
-                    nextFallingObjects[x + 1, y] = false;
-                    world.Grid[x, y] = Tile.Empty;
-                }
-                else if (x > 0 && world.Grid[x - 1, y] == Tile.Empty && world.Grid[x - 1, y + 1] == Tile.Empty && !entityManager.HasEntityAt(x - 1, y) && !entityManager.HasEntityAt(x - 1, y + 1))
-                {
-                    world.Grid[x - 1, y] = Tile.Gem;
-                    nextFallingObjects[x - 1, y] = true;
-                    world.Grid[x, y] = Tile.Empty;
-                }
-            }
+            fallingObjectLogic.Update(Tile.Gem, world, entityManager, explosionLogic, x, y, gemFalling, nextFallingObjects);
         }
     }
 }

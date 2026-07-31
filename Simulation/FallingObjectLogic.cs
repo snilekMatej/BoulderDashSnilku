@@ -73,15 +73,15 @@ namespace BoulderDashSnilku.Simulation
             {
                 return false;
             }
-            else if (!IsTrulyEmpty(world, entityManager, sideX, sideY) || !IsTrulyEmpty(world, entityManager, sideX, sideY))
-            {
-                return false;
-            }
-            else
+            else if (IsTrulyEmpty(world, entityManager, sideX, sideY) && IsTrulyEmpty(world, entityManager, diagonalX, diagonalY))
             {
                 MoveObject(objectTile, world, x, y, sideX, sideY);
                 nextFallingObjects[sideX, sideY] = false;
                 return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
