@@ -10,7 +10,7 @@ namespace BoulderDashSnilku.Simulation
 {
     class FallingObjectLogic
     {
-        public void Update(Tile objectTile, GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic, int x, int y, bool wasFalling, bool[,] nextFallingObjects)
+        public void Update(Tile objectTile, GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic, int x, int y, bool wasFalling, bool[,] nextFallingObjects, bool[,] processedObjects)
         {
             nextFallingObjects[x, y] = false;
             int bellowX = x;
@@ -20,25 +20,25 @@ namespace BoulderDashSnilku.Simulation
             
             if (tileBelow == Tile.Empty)
             {
-                UpdateVerticalMovement(objectTile, world, entityManager, explosionLogic, x, y, wasFalling, entityBelow, nextFallingObjects);
+                UpdateVerticalMovement(objectTile, world, entityManager, explosionLogic, x, y, wasFalling, entityBelow, nextFallingObjects, processedObjects);
             }
             else if (CanRollOff(tileBelow))
             {
-                if (TryRoll(objectTile, world, entityManager, x, y, 1, nextFallingObjects))
+                if (TryRoll(objectTile, world, entityManager, x, y, 1, nextFallingObjects, processedObjects))
                 {
                     return;
                 }
                 else
                 {
-                    TryRoll(objectTile, world, entityManager, x, y, -1, nextFallingObjects);
+                    TryRoll(objectTile, world, entityManager, x, y, -1, nextFallingObjects, processedObjects);
                 }
             }
         }
 
-        private void UpdateVerticalMovement(Tile objectTile, GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic, int x, int y, bool wasFalling, bool entityBelow, bool[,] nextFallingObjects)
+        private void UpdateVerticalMovement(Tile objectTile, GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic, int x, int y, bool wasFalling, bool entityBelow, bool[,] nextFallingObjects, bool[,] processedObjects)
         {
-            int bellowX = x;
-            int bellowY = y + 1;
+            int belowX = x;
+            int belowY = y + 1;
 
             if (!wasFalling && !entityBelow)
             {
@@ -46,13 +46,15 @@ namespace BoulderDashSnilku.Simulation
             }
             else if (wasFalling && entityBelow)
             {
-                Entity entity = entityManager.GetEntityAt(bellowX, bellowY);
+                Entity entity = entityManager.GetEntityAt(belowX, belowY);
                 entity.Kill(world, entityManager, explosionLogic);
             }
             else if (wasFalling && !entityBelow)
             {
-                MoveObject(objectTile, world, x, y, bellowX, bellowY);
-                nextFallingObjects[bellowX, bellowY] = true;
+                MoveObject(objectTile, world, x, y, belowX, belowY);
+                
+                nextFallingObjects[belowX, belowY] = true;
+                processedObjects[belowX, belowY] = true;
             }
         }
 
@@ -61,7 +63,7 @@ namespace BoulderDashSnilku.Simulation
             return tileBelow == Tile.Border || tileBelow == Tile.Wall || tileBelow == Tile.Boulder || tileBelow == Tile.Gem;
         }
 
-        private bool TryRoll(Tile objectTile, GameWorld world, EntityManager entityManager, int x, int y, int directionX, bool[,] nextFallingObjects)
+        private bool TryRoll(Tile objectTile, GameWorld world, EntityManager entityManager, int x, int y, int directionX, bool[,] nextFallingObjects, bool[,] processedObjects)
         {
             int sideX = x + directionX;
             int sideY = y;
@@ -76,7 +78,10 @@ namespace BoulderDashSnilku.Simulation
             else if (IsTrulyEmpty(world, entityManager, sideX, sideY) && IsTrulyEmpty(world, entityManager, diagonalX, diagonalY))
             {
                 MoveObject(objectTile, world, x, y, sideX, sideY);
-                nextFallingObjects[sideX, sideY] = false;
+
+                nextFallingObjects[sideX, sideY] = true;
+                processedObjects[sideX, sideY] = true;
+
                 return true;
             }
             else

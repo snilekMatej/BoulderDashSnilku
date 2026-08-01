@@ -30,6 +30,7 @@ namespace BoulderDashSnilku.Simulation
                 fallingObjects = new bool[world.Width, world.Height];
             }
             bool[,] nextFallingObjects = new bool[world.Width, world.Height];
+            bool[,] processedObjects = new bool[world.Width, world.Height];
 
             if (_accumulator < StepTime)
             {
@@ -41,13 +42,16 @@ namespace BoulderDashSnilku.Simulation
             {
                 for (int x = 0; x < world.Width; x++)
                 {
-                    if (world.Grid[x, y] == Tile.Boulder)
+                    if (!processedObjects[x, y])
                     {
-                        boulderLogic.Update(world, entityManager, explosionLogic, x, y, fallingObjects[x, y], nextFallingObjects);
-                    } 
-                    if (world.Grid[x, y] == Tile.Gem)
-                    {
-                        gemLogic.Update(world, entityManager, explosionLogic, x, y, fallingObjects[x, y], nextFallingObjects);
+                        if (world.Grid[x, y] == Tile.Boulder)
+                        {
+                            boulderLogic.Update(world, entityManager, explosionLogic, x, y, fallingObjects[x, y], nextFallingObjects, processedObjects);
+                        }
+                        if (world.Grid[x, y] == Tile.Gem)
+                        {
+                            gemLogic.Update(world, entityManager, explosionLogic, x, y, fallingObjects[x, y], nextFallingObjects, processedObjects);
+                        }
                     }
                 }
             }
