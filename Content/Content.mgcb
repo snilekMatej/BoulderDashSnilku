@@ -16,3 +16,56 @@
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /build:HudFont.spritefont
+
+
+#begin Tiles/Boulder.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Tiles/Boulder.png
+
+#begin Tiles/Border.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Tiles/Border.png
+
+#begin Tiles/Exit.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Tiles/Exit.png
+
+#begin Tiles/Empty.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Tiles/Empty.png
+
+#begin Tiles/Dirt.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Tiles/Dirt.png
+
+#begin Tiles/Gem.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Tiles/Gem.png
+
+#begin Tiles/Wall.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Tiles/Wall.png
+
+
+#begin Enemies/Firefly.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Enemies/Firefly.png
+
+#begin Enemies/Butterfly.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Enemies/Butterfly.png
+
+
+#begin Player/PlayerDefault.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Player/PlayerDefault.png

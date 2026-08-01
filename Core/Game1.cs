@@ -35,6 +35,10 @@ public class Game1 : Game
     private SpriteFont hudFont;
     private HudRenderer hudRenderer;
 
+    private WorldRenderer worldRenderer;
+    private EntityRenderer entityRenderer;
+    private PlayerRenderer playerRenderer;
+
     private GameplayController gameplayController;
 
     private GameState gameState;
@@ -80,6 +84,23 @@ public class Game1 : Game
 
         hudFont = Content.Load<SpriteFont>("HudFont");
         hudRenderer = new HudRenderer(hudFont);
+
+        Texture2D dirtTexture = Content.Load<Texture2D>("Tiles/Dirt");
+        Texture2D wallTexture = Content.Load<Texture2D>("Tiles/Wall");
+        Texture2D borderTexture = Content.Load<Texture2D>("Tiles/Border");
+        Texture2D boulderTexture = Content.Load<Texture2D>("Tiles/Boulder");
+        Texture2D gemTexture = Content.Load<Texture2D>("Tiles/Gem");
+        Texture2D exitTexture = Content.Load<Texture2D>("Tiles/Exit");
+        Texture2D emptyTexture = Content.Load<Texture2D>("Tiles/Empty");
+
+        Texture2D playerRexture = Content.Load<Texture2D>("Player/PlayerDefault");
+
+        Texture2D fireflyTexture = Content.Load<Texture2D>("Enemies/Firefly");
+        Texture2D butterflyTexture = Content.Load<Texture2D>("Enemies/Butterfly");
+
+        worldRenderer = new WorldRenderer(dirtTexture, wallTexture, borderTexture, boulderTexture, gemTexture, exitTexture, emptyTexture);
+        entityRenderer = new EntityRenderer(fireflyTexture, butterflyTexture);
+        playerRenderer = new PlayerRenderer(playerRexture);
 
         pixel = new Texture2D(GraphicsDevice, 1, 1);
         pixel.SetData(new[] { Color.White });
@@ -214,44 +235,12 @@ public class Game1 : Game
         }
 
         // Draw World
-        for (int y = 0; y < world.Height; y++)
-        {
-            for (int x = 0; x < world.Width; x++)
-            {
-                Color color = Color.Green;
-
-                switch (world.Grid[x, y])
-                {
-                    case Tile.Dirt: color = Color.SaddleBrown; break;
-                    case Tile.Wall: color = Color.Gray; break;
-                    case Tile.Border: color = Color.DarkBlue; break;
-                    case Tile.Boulder: color = Color.DarkSlateGray; break;
-                    case Tile.Gem: color = Color.Yellow; break;
-                    case Tile.Empty: color = Color.Black; break;
-                }
-
-                _spriteBatch.Draw(pixel, new Rectangle(x * TileSize, y * TileSize + HudHeight, TileSize, TileSize), color);
-            }
-        }
+        worldRenderer.Draw(_spriteBatch, world, TileSize, HudHeight);
         // Draw PLayer
-        _spriteBatch.Draw(pixel, new Rectangle(player.x * TileSize, player.y * TileSize + HudHeight, TileSize, TileSize), player.IsAlive ? Color.Cyan : Color.Red);
-        foreach (Firefly firefly in entityManager.GetEntities<Firefly>())
-        {
-            if (!firefly.IsAlive)
-            {
-                continue;
-            }
-            _spriteBatch.Draw(pixel, new Rectangle(firefly.x * TileSize, firefly.y * TileSize + HudHeight, TileSize, TileSize), Color.Purple);
-        }
-        foreach (Butterfly butterfly in entityManager.GetEntities<Butterfly>())
-        {
-            if (!butterfly.IsAlive)
-            {
-                continue;
-            }
-            _spriteBatch.Draw(pixel, new Rectangle(butterfly.x * TileSize, butterfly.y * TileSize + HudHeight, TileSize, TileSize), Color.Orange);
-        }
-
+        playerRenderer.Draw(_spriteBatch, player, TileSize, HudHeight);
+        // Draw Entities
+        entityRenderer.Draw(_spriteBatch, entityManager, TileSize, HudHeight);
+        // Draw HUD
         hudRenderer.Draw(_spriteBatch, gameSession, levelState);
 
         _spriteBatch.End();
