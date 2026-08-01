@@ -17,6 +17,11 @@
 /processor:FontDescriptionProcessor
 /build:HudFont.spritefont
 
+#begin Fonts/codepage437-8x8.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/build:Fonts/codepage437-8x8.png
+
 
 #begin Tiles/Boulder.png
 /importer:TextureImporter

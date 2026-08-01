@@ -32,7 +32,7 @@ public class Game1 : Game
     private WorldSimulation worldSimulation;
     private InputManager _input;
 
-    private SpriteFont hudFont;
+    private BitmapFont hudFont;
     private HudRenderer hudRenderer;
 
     private WorldRenderer worldRenderer;
@@ -82,7 +82,8 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        hudFont = Content.Load<SpriteFont>("HudFont");
+        Texture2D fontTexture = Content.Load<Texture2D>("Fonts/codepage437-8x8");
+        hudFont = new BitmapFont(fontTexture);
         hudRenderer = new HudRenderer(hudFont);
 
         Texture2D dirtTexture = Content.Load<Texture2D>("Tiles/Dirt");
@@ -248,8 +249,8 @@ public class Game1 : Game
     }
     private void DrawStartScreen()
     {
-        const string title = "BOULDER     DASH";
-        const string instruction = "PRESS     ENTER     TO     START";
+        const string title = "BOULDER DASH";
+        const string instruction = "PRESS ENTER TO START";
 
         Vector2 titleSise = hudFont.MeasureString(title);
         Vector2 instructionSize = hudFont.MeasureString(instruction);
@@ -260,8 +261,8 @@ public class Game1 : Game
         Vector2 titlePosition = new Vector2((logicalScreenWidth - titleSise.X) / 2, logicalScreenHeight / 2 - 24);
         Vector2 instructionPosition = new Vector2((logicalScreenWidth - instructionSize.X) / 2, logicalScreenHeight / 2 + 8);
 
-        _spriteBatch.DrawString(hudFont, title, titlePosition, Color.White);
-        _spriteBatch.DrawString(hudFont, instruction, instructionPosition, Color.White);
+        hudFont.DrawText(_spriteBatch, title, titlePosition, Color.White);
+        hudFont.DrawText(_spriteBatch, instruction, instructionPosition, Color.White);
     }
     private void DrawEndScreen()
     {
@@ -278,9 +279,9 @@ public class Game1 : Game
 
         _spriteBatch.Draw(pixel, box, Color.DarkBlue);
 
-        const string title = "YOU     WIN!";
-        string scoreText = $"YOUR     SCORE     IS     {gameSession.Score:D5}";
-        const string thanks = "THANKS     FOR     PLAYING!!!";
+        const string title = "YOU WIN!";
+        string scoreText = $"YOUR SCORE IS {gameSession.Score:D5}";
+        const string thanks = "THANKS FOR PLAYING!!!";
 
         DrawCenteredText(title, boxY + 18, logicalWidth, Color.White);
         DrawCenteredText(scoreText, boxY + 50, logicalWidth, Color.White);
@@ -292,7 +293,7 @@ public class Game1 : Game
         Vector2 textSize = hudFont.MeasureString(text);
         Vector2 position = new Vector2((screenWidth - textSize.X) / 2, y);
 
-        _spriteBatch.DrawString(hudFont, text, position, color);
+        hudFont.DrawText(_spriteBatch, text, position, color);
     }
 
 

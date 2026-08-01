@@ -14,9 +14,9 @@ namespace BoulderDashSnilku.Rendering
 {
     public class HudRenderer
     {
-        private readonly SpriteFont font;
+        private readonly BitmapFont font;
 
-        public HudRenderer(SpriteFont font)
+        public HudRenderer(BitmapFont font)
         {
             this.font = font;
         }
@@ -24,7 +24,7 @@ namespace BoulderDashSnilku.Rendering
         public void Draw(SpriteBatch spriteBatch, GameSession gameSession, LevelState levelState)
         {
             string text = $"{levelState.RequiredGems:D2}/" + $"{levelState.GemValue:D2}   " + $"{levelState.CollectedGems:D2}   " + $"SCORE: {gameSession.Score:D5}   " + $"TIME: {levelState.TimeLeft:D3}";
-            spriteBatch.DrawString(font, text, new Vector2(8, 4), Color.White);
+            font.DrawText(spriteBatch, text, new Vector2(8, 4), Color.White);
         }
     }
 }
