@@ -60,6 +60,13 @@ namespace BoulderDashSnilku.Rendering
             }
         }
 
+        public void DrawCenteredText(SpriteBatch spriteBatch, string text, float y, float screenWidth, Color characterColor, Color? backgroundColor = null)
+        {
+            Vector2 textSize = MeasureString(text);
+            Vector2 position = new Vector2(screenWidth - textSize.X / 2, y);
+            DrawText(spriteBatch, text, position, characterColor, backgroundColor);
+        }
+
         public Vector2 MeasureString(string text)
         {
             int currentWidth = 0;

@@ -113,45 +113,54 @@ public class Game1 : Game
     {
         KeyboardState currentKeyboardState = Keyboard.GetState();
 
-        if (gameState == GameState.StartScreen)
+        switch (gameState)
         {
-            bool enterPressed = currentKeyboardState.IsKeyDown(Keys.Enter) && previousKeyboardState.IsKeyUp(Keys.Enter);
-
-            if (enterPressed)
-            {
-                currentLevel = 0;
-                gameSession = new GameSession();
-
-                LoadLevel(currentLevel);
-                gameState = GameState.Gameplay;
-            }
-            previousKeyboardState = currentKeyboardState;
-
-            if (currentKeyboardState.IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
-            base.Update(gameTime);
-            return;
+            case GameState.StartScreen:
+                UpdateStartScreen(currentKeyboardState);
+                break;
+            case GameState.Gameplay:
+                UpdateGameplay(gameTime);
+                break;
+            case GameState.EndScreen:
+                UpdateEndScreen(currentKeyboardState);
+                break;
         }
-        if (gameState == GameState.EndScreen)
+        previousKeyboardState = currentKeyboardState;
+
+        if (currentKeyboardState.IsKeyDown(Keys.Escape))
         {
-            bool enterPressed = currentKeyboardState.IsKeyDown(Keys.Enter) && previousKeyboardState.IsKeyUp(Keys.Enter);
-
-            if (enterPressed)
-            {
-                gameState = GameState.StartScreen;
-            }
-            previousKeyboardState = currentKeyboardState;
-
-            if (currentKeyboardState.IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
-            base.Update(gameTime);
-            return;
+            Exit();
         }
+        base.Update(gameTime);
+    }
 
+    private void UpdateStartScreen(KeyboardState currentKeyboardState)
+    {
+        if (WasKeyPressed(currentKeyboardState, Keys.Enter))
+        {
+            currentLevel = 0;
+            gameSession = new GameSession();
+
+            LoadLevel(currentLevel);
+            gameState = GameState.Gameplay;
+        }
+    }
+
+    private void UpdateEndScreen(KeyboardState currentKeyboardState)
+    {
+        if (WasKeyPressed(currentKeyboardState, Keys.Enter))
+        {
+            gameState = GameState.StartScreen;
+        }
+    }
+
+    private bool WasKeyPressed(KeyboardState currentKeyboardState, Keys key)
+    {
+        return currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyUp(key);
+    }
+
+    private void UpdateGameplay(GameTime gameTime)
+    {
         _input.Update(gameTime);
 
         bool restartLevel = gameplayController.Update(gameTime, player);
@@ -159,29 +168,11 @@ public class Game1 : Game
         if (restartLevel)
         {
             LoadLevel(currentLevel);
-            gameplayController.StartLevel();
-
-            base.Update(gameTime);
             return;
         }
         if (gameplayController.IsPlaying)
         {
-            timerAccumulator += gameTime.ElapsedGameTime.TotalSeconds;
-
-            while (timerAccumulator >= 1.0)
-            {
-                timerAccumulator -= 1.0;
-
-                if (levelState.TimeLeft > 0)
-                {
-                    levelState.TimeLeft--;
-                }
-                if (levelState.TimeLeft <= 0 && player.IsAlive)
-                {
-                    player.Kill(world, entityManager, explosionLogic);
-                    break;
-                }
-            }
+            UpdateLevelTimer(gameTime);
 
             MoveDirection direction = _input.GetMoveDirection();
             playerLogic.Update(player, world, entityManager, levelState, gameSession, direction, explosionLogic);
@@ -201,50 +192,48 @@ public class Game1 : Game
                 worldSimulation.Update(world, entityManager, gameTime);
             }
         }
+    }
 
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
+    private void UpdateLevelTimer(GameTime gameTime)
+    {
+        timerAccumulator += gameTime.ElapsedGameTime.TotalSeconds;
 
-        previousKeyboardState = currentKeyboardState;
+        while (timerAccumulator >= 1.0)
+        {
+            timerAccumulator -= 1.0;
 
-        base.Update(gameTime);
+            if (levelState.TimeLeft > 0)
+            {
+                levelState.TimeLeft--;
+            }
+            if (levelState.TimeLeft <= 0 && player.IsAlive)
+            {
+                player.Kill(world, entityManager, explosionLogic);
+                return;
+            }
+        }
     }
 
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.Black);
 
-        _spriteBatch.Begin(
-            samplerState: SamplerState.PointClamp,
-            transformMatrix: Matrix.CreateScale(PixelScale));
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Matrix.CreateScale(PixelScale));
 
-        if (gameState == GameState.StartScreen)
+        switch (gameState)
         {
-            DrawStartScreen();
-
-            _spriteBatch.End();
-            base.Draw(gameTime);
-            return;
+            case GameState.StartScreen:
+                DrawStartScreen();
+                break;
+            case GameState.Gameplay:
+                DrawGameplay();
+                break;
+            case GameState.EndScreen:
+                DrawEndScreen();
+                break;
         }
-        if (gameState == GameState.EndScreen)
-        {
-            DrawEndScreen();
-
-            _spriteBatch.End();
-            base.Draw(gameTime);
-            return;
-        }
-
-        // Draw World
-        worldRenderer.Draw(_spriteBatch, world, TileSize, HudHeight);
-        // Draw PLayer
-        playerRenderer.Draw(_spriteBatch, player, TileSize, HudHeight);
-        // Draw Entities
-        entityRenderer.Draw(_spriteBatch, entityManager, TileSize, HudHeight);
-        // Draw HUD
-        hudRenderer.Draw(_spriteBatch, gameSession, levelState);
-
         _spriteBatch.End();
+
         base.Draw(gameTime);
     }
     private void DrawStartScreen()
@@ -252,18 +241,21 @@ public class Game1 : Game
         const string title = "BOULDER DASH";
         const string instruction = "PRESS ENTER TO START";
 
-        Vector2 titleSise = hudFont.MeasureString(title);
-        Vector2 instructionSize = hudFont.MeasureString(instruction);
-
         float logicalScreenWidth = _graphics.PreferredBackBufferWidth / PixelScale;
         float logicalScreenHeight = _graphics.PreferredBackBufferHeight / PixelScale;
 
-        Vector2 titlePosition = new Vector2((logicalScreenWidth - titleSise.X) / 2, logicalScreenHeight / 2 - 24);
-        Vector2 instructionPosition = new Vector2((logicalScreenWidth - instructionSize.X) / 2, logicalScreenHeight / 2 + 8);
-
-        hudFont.DrawText(_spriteBatch, title, titlePosition, Color.White);
-        hudFont.DrawText(_spriteBatch, instruction, instructionPosition, Color.White);
+        hudFont.DrawCenteredText(_spriteBatch, title, logicalScreenHeight / 2 - 24, logicalScreenWidth, Color.White);
+        hudFont.DrawCenteredText(_spriteBatch, instruction, logicalScreenHeight / 2 + 8, logicalScreenWidth, Color.White);
     }
+
+    private void DrawGameplay()
+    {
+        worldRenderer.Draw(_spriteBatch, world, TileSize, HudHeight);
+        playerRenderer.Draw(_spriteBatch, player, TileSize, HudHeight);
+        entityRenderer.Draw(_spriteBatch, entityManager, TileSize, HudHeight);
+        hudRenderer.Draw(_spriteBatch, gameSession, levelState);
+    }
+
     private void DrawEndScreen()
     {
         const int boxWidth = 260;
@@ -283,17 +275,9 @@ public class Game1 : Game
         string scoreText = $"YOUR SCORE IS {gameSession.Score:D5}";
         const string thanks = "THANKS FOR PLAYING!!!";
 
-        DrawCenteredText(title, boxY + 18, logicalWidth, Color.White);
-        DrawCenteredText(scoreText, boxY + 50, logicalWidth, Color.White);
-        DrawCenteredText(thanks, boxY + 82, logicalWidth, Color.White);
-    }
-
-    private void DrawCenteredText(string text, float y, float screenWidth, Color color)
-    {
-        Vector2 textSize = hudFont.MeasureString(text);
-        Vector2 position = new Vector2((screenWidth - textSize.X) / 2, y);
-
-        hudFont.DrawText(_spriteBatch, text, position, color);
+        hudFont.DrawCenteredText(_spriteBatch, title, boxY + 18, logicalWidth, Color.White);
+        hudFont.DrawCenteredText(_spriteBatch, scoreText, boxY + 50, logicalWidth, Color.White);
+        hudFont.DrawCenteredText(_spriteBatch, thanks, boxY + 82, logicalWidth, Color.White);
     }
 
 
@@ -306,7 +290,6 @@ public class Game1 : Game
         {
             return false;
         }
-
         LoadedLevel loadedLevel = LevelLoader.Load(levelPath);
 
         world = loadedLevel.World;
