@@ -3,30 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using BoulderDashSnilku.Library;
 using BoulderDashSnilku.Simulation;
 using BoulderDashSnilku.World;
 
 namespace BoulderDashSnilku.Entities
 {
-    public class Butterfly : Entity
+    public class Butterfly : Enemy
     {
-        public Direction Direction { get; set; }
-        public int MoveTimer { get; set; } = 0;
-        public Butterfly(int x, int y) : base(x, y)
+        public Butterfly(int x, int y) : base(x, y) { }
+
+        public override Direction GetPreferredDirection()
         {
-            Direction = Direction.Up;
+            return Direction.TurnRight();
+        }
+
+        public override Direction GetBlockedTurn()
+        {
+            return Direction.TurnLeft();
         }
 
         public override void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
         {
-            if (!IsAlive)
+            if (IsAlive)
             {
-                return;
-            }
-            IsAlive = false;
+                IsAlive = false;
 
-            explosionLogic.Explode(this, world, entityManager, ExplosionResult.Gems);
+                explosionLogic.Explode(this, world, entityManager, ExplosionResult.Gems);
+            }
         }
     }
 }

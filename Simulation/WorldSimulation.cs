@@ -17,8 +17,7 @@ namespace BoulderDashSnilku.Simulation
 
         private BoulderLogic boulderLogic = new BoulderLogic();
         private GemLogic gemLogic = new GemLogic();
-        private FireflyLogic fireflyLogic = new FireflyLogic();
-        private ButterflyLogic butterflyLogic = new ButterflyLogic();
+        private EnemyLogic enemyLogic = new EnemyLogic();
         private ExplosionLogic explosionLogic = new ExplosionLogic();
 
         private bool[,] fallingObjects;
@@ -53,27 +52,15 @@ namespace BoulderDashSnilku.Simulation
                 }
             }
             
-            foreach (Firefly firefly in entityManager.GetEntities<Firefly>().ToList())
+            foreach (Enemy enemy in entityManager.GetEntities<Enemy>().ToList())
             {
-                if (firefly.IsAlive)
+                if (enemy.IsAlive)
                 {
-                    firefly.MoveTimer++;
-                    if (firefly.MoveTimer >= 3)
+                    enemy.MoveTimer++;
+                    if (enemy.MoveTimer >= 3)
                     {
-                        firefly.MoveTimer = 0;
-                        fireflyLogic.Update(firefly, world, entityManager, explosionLogic);
-                    }
-                }
-            }
-            foreach (Butterfly butterfly in entityManager.GetEntities<Butterfly>().ToList())
-            {
-                if (butterfly.IsAlive)
-                {
-                    butterfly.MoveTimer++;
-                    if (butterfly.MoveTimer >= 3)
-                    {
-                        butterfly.MoveTimer = 0;
-                        butterflyLogic.Update(butterfly, world, entityManager, explosionLogic);
+                        enemy.MoveTimer = 0;
+                        enemyLogic.Update(enemy, world, entityManager, explosionLogic);
                     }
                 }
             }

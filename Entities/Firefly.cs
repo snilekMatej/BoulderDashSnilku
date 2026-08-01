@@ -10,24 +10,28 @@ using BoulderDashSnilku.World;
 
 namespace BoulderDashSnilku.Entities
 {
-    public class Firefly : Entity
+    public class Firefly : Enemy
     {
-        public Direction Direction { get; set; }
-        public int MoveTimer { get; set; } = 0;
-        public Firefly(int x, int y) : base(x, y)
+        public Firefly(int x, int y) : base(x, y) { }
+
+        public override Direction GetPreferredDirection()
         {
-            Direction = Direction.Up;
+            return Direction.TurnLeft();
+        }
+
+        public override Direction GetBlockedTurn()
+        {
+            return Direction.TurnRight();
         }
 
         public override void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
         {
-            if (!IsAlive)
+            if (IsAlive)
             {
-                return;
-            }
-            IsAlive = false;
+                IsAlive = false;
 
-            explosionLogic.Explode(this, world, entityManager, ExplosionResult.Gems);
+                explosionLogic.Explode(this, world, entityManager, ExplosionResult.Gems);
+            }
         }
     }
 }
