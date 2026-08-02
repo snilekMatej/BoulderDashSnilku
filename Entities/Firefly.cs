@@ -23,15 +23,5 @@ namespace BoulderDashSnilku.Entities
         {
             return Direction.TurnRight();
         }
-
-        public override void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
-        {
-            if (IsAlive)
-            {
-                IsAlive = false;
-
-                explosionLogic.Explode(this, world, entityManager, ExplosionResult.Gems);
-            }
-        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BoulderDashSnilku.Simulation;
@@ -10,17 +11,8 @@ namespace BoulderDashSnilku.Entities
 {
     public class Player : Entity
     {
+        protected override ExplosionResult DeathResult => ExplosionResult.Empty;
+
         public Player(int x, int y) : base(x, y) { }
-
-        public override void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
-        {
-            if (!IsAlive)
-            {
-                return;
-            }
-            IsAlive = false;
-
-            explosionLogic.Explode(this, world, entityManager, ExplosionResult.Empty);
-        }
     }
 }

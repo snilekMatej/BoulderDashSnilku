@@ -14,6 +14,8 @@ namespace BoulderDashSnilku.Entities
     {
         public Butterfly(int x, int y) : base(x, y) { }
 
+        protected override ExplosionResult DeathResult => ExplosionResult.Gems;
+
         public override Direction GetPreferredDirection()
         {
             return Direction.TurnRight();
@@ -22,16 +24,6 @@ namespace BoulderDashSnilku.Entities
         public override Direction GetBlockedTurn()
         {
             return Direction.TurnLeft();
-        }
-
-        public override void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
-        {
-            if (IsAlive)
-            {
-                IsAlive = false;
-
-                explosionLogic.Explode(this, world, entityManager, ExplosionResult.Gems);
-            }
         }
     }
 }

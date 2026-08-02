@@ -14,6 +14,8 @@ namespace BoulderDashSnilku.Entities
         public int y { get; protected set; }
         public bool IsAlive { get; protected set; } = true;
 
+        protected abstract ExplosionResult DeathResult { get; }
+
         protected Entity(int x, int y)
         {
             this.x = x;
@@ -25,14 +27,14 @@ namespace BoulderDashSnilku.Entities
             this.y = y;
         }
 
-        public virtual void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
+        public void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
         {
             if (!IsAlive)
             {
-                return;
-            }
+                IsAlive = false;
 
-            IsAlive = false;
+                explosionLogic.Explode(this, world, entityManager, DeathResult);
+            }
         }
     }
 }

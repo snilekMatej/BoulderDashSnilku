@@ -15,6 +15,8 @@ namespace BoulderDashSnilku.Entities
         public Direction Direction { get; set; }
         public int MoveTimer { get; set; }
 
+        protected override ExplosionResult DeathResult => ExplosionResult.Gems;
+
         protected Enemy(int x, int y) : base(x, y)
         {
             Direction = Direction.Up;
