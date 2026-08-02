@@ -63,7 +63,7 @@ namespace BoulderDashSnilku.Rendering
         public void DrawCenteredText(SpriteBatch spriteBatch, string text, float y, float screenWidth, Color characterColor, Color? backgroundColor = null)
         {
             Vector2 textSize = MeasureString(text);
-            Vector2 position = new Vector2(screenWidth - textSize.X / 2, y);
+            Vector2 position = new Vector2((screenWidth - textSize.X) / 2, y);
             DrawText(spriteBatch, text, position, characterColor, backgroundColor);
         }
 
@@ -91,7 +91,7 @@ namespace BoulderDashSnilku.Rendering
             return new Vector2(maxWidth, lines * GlyphHeight);
         }
 
-        private Texture2D CreateTransparentFontTexture(Texture2D originalTexture)
+        private static Texture2D CreateTransparentFontTexture(Texture2D originalTexture)
         {
             Color[] pixels = new Color[originalTexture.Width * originalTexture.Height];
             originalTexture.GetData(pixels);

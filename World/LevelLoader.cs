@@ -11,11 +11,13 @@ namespace BoulderDashSnilku.World
 {
     public class LevelLoader
     {
-        public const int DefaultGemQuota = 20;
-
         public static LoadedLevel Load(string filePath)
         {
             string[] lines = File.ReadAllLines(filePath);
+            if (lines.Length != 3 + 22)
+            {
+                throw new InvalidDataException("The level must contain QUOTA, GEMVALUE, TIME, and map data.");
+            }
 
             int gemQuota = ParseGemQuota(lines[0]);
             int gemValue = ParseGemValue(lines[1]);
@@ -23,9 +25,6 @@ namespace BoulderDashSnilku.World
             string[] mapLines = lines[3..];
 
             ValidateLevel(mapLines);
-
-            int width = mapLines[0].Length;
-            int height = mapLines.Length;
 
             GameWorld world = new GameWorld();
 
@@ -36,9 +35,9 @@ namespace BoulderDashSnilku.World
 
             EntityManager entityManager = new EntityManager();
 
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < world.Height; y++)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < world.Width; x++)
                 {
                     char symbol = mapLines[y][x];
 
@@ -63,6 +62,10 @@ namespace BoulderDashSnilku.World
                             world.Grid[x, y] = Tile.Gem;
                             break;
                         case 'P':
+                            if (player != null)
+                            {
+                                throw new InvalidDataException($"The level contains multiple player spawns.");
+                            }
                             player = new Player(x, y);
                             entityManager.Add(player);
                             world.Grid[x, y] = Tile.Empty;
@@ -78,6 +81,10 @@ namespace BoulderDashSnilku.World
                             world.Grid[x, y] = Tile.Empty;
                             break;
                         case 'E':
+                            if (exitX >= 0)
+                            {
+                                throw new InvalidDataException($"The level contains multiple exits.");
+                            }
                             exitX = x;
                             exitY = y;
                             world.Grid[x, y] = Tile.Border;
@@ -158,18 +165,16 @@ namespace BoulderDashSnilku.World
             {
                 throw new InvalidDataException("The level file is empty.");
             }
-            int expectedWidth = 40;
-            int expectedHeight = 22;
-            if (lines.Length != expectedHeight)
+            if (lines.Length != GameWorld.DefaultHeight)
             {
                 throw new InvalidDataException(
-                    $"The level height is invalid: y = {lines.Length} != {expectedHeight}");
+                    $"The level height is invalid: y = {lines.Length} != {GameWorld.DefaultHeight}");
             }
             for (int y = 0; y < lines.Length; y++)
             {
-                if (lines[y].Length != expectedWidth)
+                if (lines[y].Length != GameWorld.DefaultWidth)
                 {
-                    throw new InvalidDataException($"The level width is invalid: line({y}).width = {lines[y].Length} != {expectedWidth}");
+                    throw new InvalidDataException($"The level width is invalid: line({y}).width = {lines[y].Length} != {GameWorld.DefaultWidth}");
                 }
             }
         }

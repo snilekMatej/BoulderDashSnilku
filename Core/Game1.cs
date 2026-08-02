@@ -152,8 +152,6 @@ public class Game1 : Game
 
     private void UpdateGameplay(GameTime gameTime)
     {
-        _input.Update(gameTime);
-
         bool restartLevel = gameplayController.Update(gameTime, player);
 
         if (restartLevel)
@@ -284,6 +282,7 @@ public class Game1 : Game
         LoadedLevel loadedLevel = LevelLoader.Load(levelPath);
 
         world = loadedLevel.World;
+        worldSimulation?.Reset();
         player = loadedLevel.Player;
         levelState = loadedLevel.LevelState;
         entityManager = loadedLevel.EntityManager;

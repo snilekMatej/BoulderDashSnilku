@@ -19,7 +19,7 @@ namespace BoulderDashSnilku.Input
     }
     class InputManager
     {
-        private const double HoldInterval = 0.1; // 100 millisecnds
+        private const double HoldInterval = 0.125; // 125 millisecnds
 
         private KeyboardState previousState;
         private KeyboardState currentState;
@@ -39,7 +39,7 @@ namespace BoulderDashSnilku.Input
         {
             MoveDirection direction = GetHeldDirection();
 
-            if (direction != MoveDirection.None)
+            if (direction == MoveDirection.None)
             {
                 ResetHold();
                 return direction;
@@ -51,7 +51,7 @@ namespace BoulderDashSnilku.Input
 
                 return direction;
             }
-            if (holdTimer >= 0)
+            if (holdTimer >= HoldInterval)
             {
                 holdTimer = 0;
                 return heldDirection;

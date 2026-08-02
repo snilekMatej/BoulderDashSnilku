@@ -29,7 +29,7 @@ namespace BoulderDashSnilku.Entities
 
         public void Kill(GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic)
         {
-            if (!IsAlive)
+            if (IsAlive)
             {
                 IsAlive = false;
 

@@ -12,13 +12,13 @@ namespace BoulderDashSnilku.Simulation
     public class WorldSimulation
     {
         private double _accumulator = 0;
-        private const double StepTime = 0.125;
-        private const double EnemyStepTime = 0.375;
+        private const double StepTime = 0.2;
+        private const int EnemyMoveDelay = 3;
 
-        private BoulderLogic boulderLogic = new BoulderLogic();
-        private GemLogic gemLogic = new GemLogic();
-        private EnemyLogic enemyLogic = new EnemyLogic();
-        private ExplosionLogic explosionLogic = new ExplosionLogic();
+        private readonly BoulderLogic boulderLogic = new BoulderLogic();
+        private readonly GemLogic gemLogic = new GemLogic();
+        private readonly EnemyLogic enemyLogic = new EnemyLogic();
+        private readonly ExplosionLogic explosionLogic = new ExplosionLogic();
 
         private bool[,] fallingObjects;
         public void Update(GameWorld world, EntityManager entityManager, GameTime gameTime)
@@ -29,14 +29,14 @@ namespace BoulderDashSnilku.Simulation
             {
                 fallingObjects = new bool[world.Width, world.Height];
             }
-            bool[,] nextFallingObjects = new bool[world.Width, world.Height];
-            bool[,] processedObjects = new bool[world.Width, world.Height];
-
             if (_accumulator < StepTime)
             {
                 return;
             }
-            _accumulator = 0;
+            _accumulator -= StepTime;
+
+            bool[,] nextFallingObjects = new bool[world.Width, world.Height];
+            bool[,] processedObjects = new bool[world.Width, world.Height];
 
             for (int y = world.Height - 2;  y >= 0; y--)
             {
@@ -61,7 +61,7 @@ namespace BoulderDashSnilku.Simulation
                 if (enemy.IsAlive)
                 {
                     enemy.MoveTimer++;
-                    if (enemy.MoveTimer >= 3)
+                    if (enemy.MoveTimer >= EnemyMoveDelay)
                     {
                         enemy.MoveTimer = 0;
                         enemyLogic.Update(enemy, world, entityManager, explosionLogic);
@@ -69,6 +69,12 @@ namespace BoulderDashSnilku.Simulation
                 }
             }
             fallingObjects = nextFallingObjects;
+        }
+
+        public void Reset()
+        {
+            _accumulator = 0;
+            fallingObjects = null;
         }
     }
 }

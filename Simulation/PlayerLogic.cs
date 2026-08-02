@@ -8,6 +8,7 @@ using BoulderDashSnilku.Core;
 using BoulderDashSnilku.Entities;
 using BoulderDashSnilku.Input;
 using BoulderDashSnilku.World;
+using BoulderDashSnilku.Library;
 
 namespace BoulderDashSnilku.Simulation
 {
@@ -15,40 +16,29 @@ namespace BoulderDashSnilku.Simulation
     {
         public void Update(Player player, GameWorld world, EntityManager entities, LevelState levelState, GameSession gameSession, MoveDirection direction, ExplosionLogic explosionLogic)
         {
-            int targetX = player.x;
-            int targetY = player.y;
-
-            switch (direction)
+            if (direction == MoveDirection.None)
             {
-                case MoveDirection.Left:
-                    targetX--;
-                    break;
-                case MoveDirection.Right:
-                    targetX++;
-                    break;
-                case MoveDirection.Up:
-                    targetY--;
-                    break;
-                case MoveDirection.Down:
-                    targetY++;
-                    break;
-                case MoveDirection.None:
-                default:
-                    return;
+                return;
+            }
+            (int offsetX, int offsetY) = direction.GetOffset();
+
+            int targetX = player.x + offsetX;
+            int targetY = player.y + offsetY;
+
+            // Safety to not let player move off screen.
+            if (!world.IsInBounds(targetX, targetY))
+            {
+                return;
             }
             // entities
             Entity? targetEntity = entities.GetEntityAt(targetX, targetY);
 
-            if (targetEntity is Firefly)
+            if (targetEntity is Enemy)
             {
                 player.Kill(world, entities, explosionLogic);
                 return;
             }
-            // Safety to not let player move off screen.
-            if ((targetX < 0 || targetX >= world.Width) || (targetY < 0 || targetY >= world.Height))
-            {
-                return;
-            }
+
             Tile targetTile = world.Grid[targetX, targetY];
             // colisions:
             switch (targetTile)
@@ -79,20 +69,16 @@ namespace BoulderDashSnilku.Simulation
 
         private bool TryPushBoulder(GameWorld world, EntityManager entities, MoveDirection direction, int boulderX, int boulderY)
         {
-            int destinationX = boulderX;
-            int destinationY = boulderY;
-
-            switch (direction)
+            if (direction is not (MoveDirection.Left or MoveDirection.Right))
             {
-                case MoveDirection.Left:
-                    destinationX--;
-                    break;
-                case MoveDirection.Right:
-                    destinationX++;
-                    break;
-                default:
-                    return false;
+                return false;
             }
+
+            (int offsetX, int offsetY) = direction.GetOffset();
+
+            int destinationX = boulderX + offsetX;
+            int destinationY = boulderY + offsetY;
+
             if (world.Grid[destinationX, destinationY] != Tile.Empty || entities.HasEntityAt(destinationX, destinationY))
             {
                 return false;

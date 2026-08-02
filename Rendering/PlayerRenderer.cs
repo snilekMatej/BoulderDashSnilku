@@ -23,9 +23,9 @@ namespace BoulderDashSnilku.Rendering
         {
             if (player.IsAlive)
             {
-                Vector2 position = new Vector2(player.x * tileSize, player.y * tileSize + offsetY);
+                Rectangle destination = new Rectangle(player.x * tileSize, player.y * tileSize + offsetY, tileSize, tileSize);
 
-                spriteBatch.Draw(playerTexture, position, Color.White);
+                spriteBatch.Draw(playerTexture, destination, Color.White);
             }
         }
     }

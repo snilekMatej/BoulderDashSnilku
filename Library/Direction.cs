@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BoulderDashSnilku.Input;
 
 namespace BoulderDashSnilku.Library
 {
@@ -49,6 +50,18 @@ namespace BoulderDashSnilku.Library
                 Direction.Down => (0, 1),
                 Direction.Left => (-1, 0),
 
+                _ => (0, 0)
+            };
+        }
+
+        public static (int x, int y) GetOffset(this MoveDirection direction)
+        {
+            return direction switch
+            {
+                MoveDirection.Up => (0, -1),
+                MoveDirection.Right => (1, 0),
+                MoveDirection.Down => (0, 1),
+                MoveDirection.Left => (-1, 0),
                 _ => (0, 0)
             };
         }

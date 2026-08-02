@@ -25,7 +25,7 @@ namespace BoulderDashSnilku.Simulation
                     int x = centerX + offsetX;
                     int y = centerY + offsetY;
 
-                    if (!IsInsideWorld(world, x, y))
+                    if (!world.IsInBounds(x, y))
                     {
                         continue;
                     }
@@ -58,11 +58,6 @@ namespace BoulderDashSnilku.Simulation
                 ExplosionResult.Gems => Tile.Gem,
                 _ => Tile.Empty
             };
-        }
-
-        private bool IsInsideWorld(GameWorld world, int x, int y)
-        {
-            return x >= 0 && x < world.Width && y >= 0 && y < world.Height;
         }
     }
 }

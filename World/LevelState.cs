@@ -9,14 +9,12 @@ namespace BoulderDashSnilku.World
 {
     public class LevelState
     {
-        private const int DefaultGemQuota = 20;
-
         private readonly int exitX;
         private readonly int exitY;
 
         public int RequiredGems { get; set; }
         public int GemValue { get; set; }
-        public int CollectedGems { get; set; }
+        public int CollectedGems { get; private set; }
         public int TimeLeft { get; set; }
 
         public bool IsExitOpen { get; private set; }

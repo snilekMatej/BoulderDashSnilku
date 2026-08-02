@@ -14,8 +14,6 @@ namespace BoulderDashSnilku.Entities
     {
         public Butterfly(int x, int y) : base(x, y) { }
 
-        protected override ExplosionResult DeathResult => ExplosionResult.Gems;
-
         public override Direction GetPreferredDirection()
         {
             return Direction.TurnRight();

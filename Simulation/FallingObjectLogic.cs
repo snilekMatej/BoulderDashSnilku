@@ -16,7 +16,7 @@ namespace BoulderDashSnilku.Simulation
             int bellowX = x;
             int bellowY = y + 1;
             Tile tileBelow = world.Grid[bellowX, bellowY];
-            bool entityBelow = entityManager.HasEntityAt(bellowX, bellowY);
+            Entity entityBelow = entityManager.GetEntityAt(bellowX, bellowY);
             
             if (tileBelow == Tile.Empty)
             {
@@ -28,28 +28,25 @@ namespace BoulderDashSnilku.Simulation
                 {
                     return;
                 }
-                else
-                {
                     TryRoll(objectTile, world, entityManager, x, y, -1, nextFallingObjects, processedObjects);
-                }
             }
         }
 
-        private void UpdateVerticalMovement(Tile objectTile, GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic, int x, int y, bool wasFalling, bool entityBelow, bool[,] nextFallingObjects, bool[,] processedObjects)
+        private void UpdateVerticalMovement(Tile objectTile, GameWorld world, EntityManager entityManager, ExplosionLogic explosionLogic, int x, int y, bool wasFalling, Entity entityBelow, bool[,] nextFallingObjects, bool[,] processedObjects)
         {
             int belowX = x;
             int belowY = y + 1;
 
-            if (!wasFalling && !entityBelow)
+            if (!wasFalling && entityBelow == null)
             {
                 nextFallingObjects[x, y] = true;
             }
-            else if (wasFalling && entityBelow)
+            else if (wasFalling && entityBelow != null)
             {
                 Entity entity = entityManager.GetEntityAt(belowX, belowY);
                 entity.Kill(world, entityManager, explosionLogic);
             }
-            else if (wasFalling && !entityBelow)
+            else if (wasFalling && entityBelow == null)
             {
                 MoveObject(objectTile, world, x, y, belowX, belowY);
                 
@@ -71,23 +68,20 @@ namespace BoulderDashSnilku.Simulation
             int diagonalX = sideX;
             int diagonalY = sideY + 1;
 
-            if (!IsInsideWorld(world, sideX, sideY) || !IsInsideWorld(world, diagonalX, diagonalY))
+            if (!world.IsInBounds(sideX, sideY) || !world.IsInBounds(diagonalX, diagonalY))
             {
                 return false;
             }
-            else if (IsTrulyEmpty(world, entityManager, sideX, sideY) && IsTrulyEmpty(world, entityManager, diagonalX, diagonalY))
-            {
-                MoveObject(objectTile, world, x, y, sideX, sideY);
-
-                nextFallingObjects[sideX, sideY] = true;
-                processedObjects[sideX, sideY] = true;
-
-                return true;
-            }
-            else
+            else if (!IsTrulyEmpty(world, entityManager, sideX, sideY) || !IsTrulyEmpty(world, entityManager, diagonalX, diagonalY))
             {
                 return false;
             }
+            MoveObject(objectTile, world, x, y, sideX, sideY);
+
+            nextFallingObjects[sideX, sideY] = true;
+            processedObjects[sideX, sideY] = true;
+
+            return true;
         }
 
         private static void MoveObject(Tile objectTile, GameWorld world, int oldX, int oldY, int newX, int newY)
@@ -99,11 +93,6 @@ namespace BoulderDashSnilku.Simulation
         private static bool IsTrulyEmpty(GameWorld world, EntityManager entityManager, int x, int y)
         {
             return world.Grid[x, y] == Tile.Empty && !entityManager.HasEntityAt(x, y);
-        }
-
-        private static bool IsInsideWorld(GameWorld world, int x, int y)
-        {
-            return x >= 0 && x < world.Width && y >= 0 && y < world.Height;
         }
     }
 }

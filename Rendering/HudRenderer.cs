@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 using BoulderDashSnilku.Core;
 using BoulderDashSnilku.World;
-using System.Threading.Tasks.Sources;
 
 namespace BoulderDashSnilku.Rendering
 {
@@ -23,8 +22,13 @@ namespace BoulderDashSnilku.Rendering
 
         public void Draw(SpriteBatch spriteBatch, GameSession gameSession, LevelState levelState)
         {
-            string text = $"{levelState.RequiredGems:D2}/" + $"{levelState.GemValue:D2}   " + $"{levelState.CollectedGems:D2}   " + $"SCORE: {gameSession.Score:D5}   " + $"TIME: {levelState.TimeLeft:D3}";
-            font.DrawText(spriteBatch, text, new Vector2(8, 4), Color.White);
+            string text = 
+                $"{levelState.RequiredGems:D2}/" +
+                $"{levelState.GemValue:D2}   " +
+                $"{levelState.CollectedGems:D2}   " +
+                $"SCORE: {gameSession.Score:D5}   " +
+                $"TIME: {levelState.TimeLeft:D3}";
+            font.DrawText(spriteBatch, text, new Vector2(16, 8), Color.White);
         }
     }
 }

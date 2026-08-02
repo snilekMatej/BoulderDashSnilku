@@ -23,18 +23,18 @@ namespace BoulderDashSnilku.Rendering
 
         public void Draw(SpriteBatch spriteBatch, EntityManager entityManager, int tileSize, int offsetY)
         {
-            foreach (Firefly firefly in entityManager.GetEntities<Firefly>())
+            foreach (Enemy enemy in entityManager.GetEntities<Enemy>())
             {
-                if (firefly.IsAlive)
+                if (enemy.IsAlive)
                 {
-                    DrawEntity(spriteBatch, firefly, fireflyTexture, tileSize, offsetY);
-                }
-            }
-            foreach (Butterfly butterfly in entityManager.GetEntities<Butterfly>())
-            {
-                if (butterfly.IsAlive)
-                {
-                    DrawEntity(spriteBatch, butterfly, butterflyTexture, tileSize, offsetY);
+                    Texture2D texture = enemy switch
+                    {
+                        Firefly => fireflyTexture,
+                        Butterfly => butterflyTexture,
+
+                        _ => throw new InvalidOperationException($"Missing texture for enemy type {enemy.GetType().Name}.")
+                    };
+                    DrawEntity(spriteBatch, enemy, texture, tileSize, offsetY);
                 }
             }
         }

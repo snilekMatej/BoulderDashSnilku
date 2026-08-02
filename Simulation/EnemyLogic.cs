@@ -37,7 +37,7 @@ namespace BoulderDashSnilku.Simulation
             int targetX = enemy.x + offsetX;
             int targetY = enemy.y + offsetY;
 
-            if (targetX < 0 || targetX >= world.Width || targetY < 0 || targetY >= world.Height)
+            if (!world.IsInBounds(targetX, targetY))
             {
                 return false;
             }
