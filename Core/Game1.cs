@@ -42,7 +42,6 @@ public class Game1 : Game
     private GameplayController gameplayController;
 
     private GameState gameState;
-    private KeyboardState previousKeyboardState;
 
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
@@ -111,32 +110,29 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        KeyboardState currentKeyboardState = Keyboard.GetState();
-
+        _input.Update(gameTime);
         switch (gameState)
         {
             case GameState.StartScreen:
-                UpdateStartScreen(currentKeyboardState);
+                UpdateStartScreen();
                 break;
             case GameState.Gameplay:
                 UpdateGameplay(gameTime);
                 break;
             case GameState.EndScreen:
-                UpdateEndScreen(currentKeyboardState);
+                UpdateEndScreen();
                 break;
         }
-        previousKeyboardState = currentKeyboardState;
-
-        if (currentKeyboardState.IsKeyDown(Keys.Escape))
+        if (_input.IsPressed(Keys.Escape))
         {
             Exit();
         }
         base.Update(gameTime);
     }
 
-    private void UpdateStartScreen(KeyboardState currentKeyboardState)
+    private void UpdateStartScreen()
     {
-        if (WasKeyPressed(currentKeyboardState, Keys.Enter))
+        if (_input.IsPressed(Keys.Enter))
         {
             currentLevel = 0;
             gameSession = new GameSession();
@@ -146,17 +142,12 @@ public class Game1 : Game
         }
     }
 
-    private void UpdateEndScreen(KeyboardState currentKeyboardState)
+    private void UpdateEndScreen()
     {
-        if (WasKeyPressed(currentKeyboardState, Keys.Enter))
+        if (_input.IsPressed(Keys.Enter))
         {
             gameState = GameState.StartScreen;
         }
-    }
-
-    private bool WasKeyPressed(KeyboardState currentKeyboardState, Keys key)
-    {
-        return currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyUp(key);
     }
 
     private void UpdateGameplay(GameTime gameTime)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BoulderDashSnilku.Library;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -18,65 +19,75 @@ namespace BoulderDashSnilku.Input
     }
     class InputManager
     {
-        private KeyboardState _previous;
-        private KeyboardState _current;
+        private const double HoldInterval = 0.1; // 100 millisecnds
 
-        private double _holdTimer = 0;
-        private const double Holdinterval = 0.1; // 100 millisecnds
-        private MoveDirection _heldDirection = MoveDirection.None;
+        private KeyboardState previousState;
+        private KeyboardState currentState;
+
+        private double holdTimer = 0;
+        private MoveDirection heldDirection = MoveDirection.None;
 
         public void Update(GameTime gameTime)
         {
-            _previous = _current;
-            _current = Keyboard.GetState();
+            previousState = currentState;
+            currentState = Keyboard.GetState();
 
-            _holdTimer += gameTime.ElapsedGameTime.TotalSeconds;
+            holdTimer += gameTime.ElapsedGameTime.TotalSeconds;
         }
 
         public MoveDirection GetMoveDirection()
         {
-            MoveDirection Direction = MoveDirection.None;
+            MoveDirection direction = GetHeldDirection();
 
-            if (_current.IsKeyDown(Keys.Up))
+            if (direction != MoveDirection.None)
             {
-                Direction = MoveDirection.Up;
+                ResetHold();
+                return direction;
             }
-            if (_current.IsKeyDown(Keys.Down))
+            if (direction != heldDirection)
             {
-                Direction = MoveDirection.Down;
-            }
-            if (_current.IsKeyDown(Keys.Left))
-            {
-                Direction = MoveDirection.Left;
-            }
-            if (_current.IsKeyDown(Keys.Right))
-            {
-                Direction = MoveDirection.Right;
-            }
+                heldDirection = direction;
+                holdTimer = 0;
 
-            if (Direction == MoveDirection.None)
-            {
-                _heldDirection = Direction;
-                _holdTimer = 0;
-                return MoveDirection.None;
+                return direction;
             }
-            if (Direction != _heldDirection)
+            if (holdTimer >= 0)
             {
-                _heldDirection = Direction;
-                _holdTimer = 0;
-                return Direction;
-            }
-            if (_holdTimer >= Holdinterval)
-            {
-                _holdTimer = 0;
-                return _heldDirection;
+                holdTimer = 0;
+                return heldDirection;
             }
             return MoveDirection.None;
         }
 
-        private bool IsPressed(Keys key)
+        private MoveDirection GetHeldDirection()
         {
-            return _current.IsKeyDown(key) && !_previous.IsKeyDown(key);
+            if (currentState.IsKeyDown(Keys.Up))
+            {
+                return MoveDirection.Up;
+            }
+            if (currentState.IsKeyDown(Keys.Down))
+            {
+                return MoveDirection.Down;
+            }
+            if (currentState.IsKeyDown(Keys.Left))
+            {
+                return MoveDirection.Left;
+            }
+            if (currentState.IsKeyDown(Keys.Right))
+            {
+                return MoveDirection.Right;
+            }
+            return MoveDirection.None;
+        }
+
+        private void ResetHold()
+        {
+            heldDirection = MoveDirection.None;
+            holdTimer = 0;
+        }
+        public bool IsPressed(Keys key)
+        {
+            return currentState.IsKeyDown(key) && !previousState.IsKeyDown(key);
         }
     }
 }
