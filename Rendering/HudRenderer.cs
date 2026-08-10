@@ -23,6 +23,7 @@ namespace BoulderDashSnilku.Rendering
         public void Draw(SpriteBatch spriteBatch, GameSession gameSession, LevelState levelState)
         {
             string text = 
+                $"♥{gameSession.PlayreLives}" +
                 $"{levelState.RequiredGems:D2}/" +
                 $"{levelState.GemValue:D2}   " +
                 $"{levelState.CollectedGems:D2}   " +

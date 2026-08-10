@@ -156,8 +156,11 @@ public class Game1 : Game
 
         if (restartLevel)
         {
-            LoadLevel(currentLevel);
-            return;
+            if (!HandlePlayerDeath())
+            {
+                LoadLevel(currentLevel);
+                return;
+            }
         }
         if (gameplayController.IsPlaying)
         {
@@ -289,5 +292,17 @@ public class Game1 : Game
 
         gameplayController.StartLevel();
         return true;
+    }
+
+    private bool HandlePlayerDeath()
+    {
+        gameSession.PlayreLives--;
+
+        if (gameSession.PlayreLives < 0)
+        {
+            gameState = GameState.StartScreen;
+            return true;
+        }
+        return false;
     }
 }
