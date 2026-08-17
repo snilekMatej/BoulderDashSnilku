@@ -2,18 +2,16 @@
 using BoulderDashSnilku.World;
 using BoulderDashSnilku.Entities;
 using BoulderDashSnilku.Simulation;
-
+using BoulderDashSnilku.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.IO;
-using BoulderDashSnilku.Rendering;
 
 namespace BoulderDashSnilku.Core;
 
-public class Game1 : Game
-{
+public class Game1 : Game {
     private const int PixelScale = 2;
     private const int TileSize = 16;
     private const int HudHeight = 32;
@@ -28,40 +26,37 @@ public class Game1 : Game
 
     private PlayerLogic playerLogic;
     private ExplosionLogic explosionLogic;
-
     private WorldSimulation worldSimulation;
     private InputManager _input;
 
     private BitmapFont hudFont;
     private HudRenderer hudRenderer;
-
     private WorldRenderer worldRenderer;
     private EntityRenderer entityRenderer;
     private PlayerRenderer playerRenderer;
 
     private GameplayController gameplayController;
-
     private GameState gameState;
 
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private Texture2D pixel;
 
-    public Game1()
-    {
+    public Game1() {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
 
-    protected override void Initialize()
-    {
+    /// <summary>
+    /// Creates the initial game state and gameplay systems.
+    /// </summary>
+    protected override void Initialize() {
         currentLevel = 0;
         gameSession = new GameSession();
 
         playerLogic = new PlayerLogic();
         explosionLogic = new ExplosionLogic();
-
         worldSimulation = new WorldSimulation();
         _input = new InputManager();
 
@@ -70,13 +65,18 @@ public class Game1 : Game
 
         LoadLevel(currentLevel);
 
-        _graphics.PreferredBackBufferWidth = world.Width * TileSize * PixelScale;
-        _graphics.PreferredBackBufferHeight = (world.Height * TileSize + HudHeight) * PixelScale;
+        _graphics.PreferredBackBufferWidth =
+            world.Width * TileSize * PixelScale;
+        _graphics.PreferredBackBufferHeight = 
+            (world.Height * TileSize + HudHeight) * PixelScale;
         _graphics.ApplyChanges();
-
         base.Initialize();
     }
 
+    /// <summary>
+    /// Loads all textures and creates renderers used by game.
+    /// Content is loaded once and then reused in changes of all levels.
+    /// </summary>
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -93,26 +93,27 @@ public class Game1 : Game
         Texture2D exitTexture = Content.Load<Texture2D>("Tiles/Exit");
         Texture2D emptyTexture = Content.Load<Texture2D>("Tiles/Empty");
 
-        Texture2D playerRexture = Content.Load<Texture2D>("Player/PlayerDefault");
-
+        Texture2D playerTexture = Content.Load<Texture2D>("Player/PlayerDefault");
         Texture2D fireflyTexture = Content.Load<Texture2D>("Enemies/Firefly");
         Texture2D butterflyTexture = Content.Load<Texture2D>("Enemies/Butterfly");
 
-        worldRenderer = new WorldRenderer(dirtTexture, wallTexture, borderTexture, boulderTexture, gemTexture, exitTexture, emptyTexture);
+        worldRenderer = new WorldRenderer(dirtTexture, wallTexture, borderTexture,
+            boulderTexture, gemTexture, exitTexture, emptyTexture);
         entityRenderer = new EntityRenderer(fireflyTexture, butterflyTexture);
-        playerRenderer = new PlayerRenderer(playerRexture);
+        playerRenderer = new PlayerRenderer(playerTexture);
 
         pixel = new Texture2D(GraphicsDevice, 1, 1);
         pixel.SetData(new[] { Color.White });
-
-        // TODO: use this.Content to load your game content here
     }
 
-    protected override void Update(GameTime gameTime)
-    {
+    /// <summary>
+    /// Updates input and game state based on the input.
+    /// Escape key can close the program at any game state.
+    /// </summary>
+    /// <param name="gameTime">Timing info for the current frame.</param>
+    protected override void Update(GameTime gameTime) {
         _input.Update(gameTime);
-        switch (gameState)
-        {
+        switch (gameState) {
             case GameState.StartScreen:
                 UpdateStartScreen();
                 break;
@@ -123,97 +124,85 @@ public class Game1 : Game
                 UpdateEndScreen();
                 break;
         }
-        if (_input.IsPressed(Keys.Escape))
-        {
-            Exit();
-        }
+        if (_input.IsPressed(Keys.Escape)) Exit();
         base.Update(gameTime);
     }
 
-    private void UpdateStartScreen()
-    {
-        if (_input.IsPressed(Keys.Enter))
-        {
+    /// <summary>
+    /// Waits for player to start the game.
+    /// Starting resets level numer and makes new game session.
+    /// </summary>
+    private void UpdateStartScreen() {
+        if (_input.IsPressed(Keys.Enter)) {
             currentLevel = 0;
             gameSession = new GameSession();
-
             LoadLevel(currentLevel);
             gameState = GameState.Gameplay;
         }
     }
 
-    private void UpdateEndScreen()
-    {
-        if (_input.IsPressed(Keys.Enter))
-        {
-            gameState = GameState.StartScreen;
-        }
+    /// <summary>
+    /// Waits for player to Enter the title screen.
+    /// </summary>
+    private void UpdateEndScreen() {
+        if (_input.IsPressed(Keys.Enter)) gameState = GameState.StartScreen;
     }
 
-    private void UpdateGameplay(GameTime gameTime)
-    {
+    /// <summary>
+    /// Updates the current running level, restarting level, time, movement and world simulation.
+    /// Completing a level awards player with remaining time score and loads the next level.
+    /// Dying resets the level and Dying with no remaining lives returns to the title screen.
+    /// </summary>
+    /// <param name="gameTime">Timing information for current frame.</param>
+    private void UpdateGameplay(GameTime gameTime) {
         bool restartLevel = gameplayController.Update(gameTime, player);
-
-        if (restartLevel)
-        {
-            if (!HandlePlayerDeath())
-            {
-                LoadLevel(currentLevel);
-                return;
-            }
+        if (restartLevel) {
+            bool gameEnded = HandlePlayerDeath();
+            if (!gameEnded) LoadLevel(currentLevel);
         }
-        if (gameplayController.IsPlaying)
-        {
+        else if (gameplayController.IsPlaying) {
             UpdateLevelTimer(gameTime);
-
             MoveDirection direction = _input.GetMoveDirection();
-            playerLogic.Update(player, world, entityManager, levelState, gameSession, direction, explosionLogic);
-
-            if (levelState.IsCompleted)
-            {
+            playerLogic.Update(player, world, entityManager, levelState,
+                gameSession, direction, explosionLogic);
+            if (levelState.IsCompleted) {
                 gameSession.Score += levelState.TimeLeft;
-
                 currentLevel++;
-                if (!LoadLevel(currentLevel))
-                {
-                    gameState = GameState.EndScreen;
-                }
+                bool nextLevelLoaded = LoadLevel(currentLevel);
+                if (!nextLevelLoaded) gameState = GameState.EndScreen;
             }
-            else
-            {
-                worldSimulation.Update(world, entityManager, gameTime);
-            }
+            else worldSimulation.Update(world, entityManager, gameTime);
         }
     }
 
-    private void UpdateLevelTimer(GameTime gameTime)
-    {
+    /// <summary>
+    /// Counts down the current level time in one-second intervals.
+    /// When timer reaches zero: player is killed.
+    /// </summary>
+    /// <param name="gameTime">Timing information to measure elapsed seconds</param>
+    private void UpdateLevelTimer(GameTime gameTime) {
         timerAccumulator += gameTime.ElapsedGameTime.TotalSeconds;
-
-        while (timerAccumulator >= 1.0)
-        {
+        bool playerKilled = false;
+        while (timerAccumulator >= 1.0 && !playerKilled) {
             timerAccumulator -= 1.0;
-
-            if (levelState.TimeLeft > 0)
-            {
-                levelState.TimeLeft--;
-            }
-            if (levelState.TimeLeft <= 0 && player.IsAlive)
-            {
+            if (levelState.TimeLeft > 0) levelState.TimeLeft--;
+            if (levelState.TimeLeft <= 0 && player.IsAlive) {
                 player.Kill(world, entityManager, explosionLogic);
-                return;
+                playerKilled = true;
             }
         }
     }
 
-    protected override void Draw(GameTime gameTime)
-    {
+    /// <summary>
+    /// Draws the active screen.
+    /// The game is rendered according to the current game state.
+    /// </summary>
+    /// <param name="gameTime">Timing information for current frame</param>
+    protected override void Draw(GameTime gameTime) {
         GraphicsDevice.Clear(Color.Black);
-
-        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Matrix.CreateScale(PixelScale));
-
-        switch (gameState)
-        {
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp,
+            transformMatrix: Matrix.CreateScale(PixelScale));
+        switch (gameState) {
             case GameState.StartScreen:
                 DrawStartScreen();
                 break;
@@ -225,84 +214,90 @@ public class Game1 : Game
                 break;
         }
         _spriteBatch.End();
-
         base.Draw(gameTime);
     }
-    private void DrawStartScreen()
-    {
+
+    /// <summary>
+    /// Draws the title screen.
+    /// It displaies the information to start the game.
+    /// </summary>
+    private void DrawStartScreen() {
         const string title = "BOULDER DASH";
         const string instruction = "PRESS ENTER TO START";
-
         float logicalScreenWidth = _graphics.PreferredBackBufferWidth / PixelScale;
         float logicalScreenHeight = _graphics.PreferredBackBufferHeight / PixelScale;
-
-        hudFont.DrawCenteredText(_spriteBatch, title, logicalScreenHeight / 2 - 24, logicalScreenWidth, Color.White);
-        hudFont.DrawCenteredText(_spriteBatch, instruction, logicalScreenHeight / 2 + 8, logicalScreenWidth, Color.White);
+        hudFont.DrawCenteredText(_spriteBatch, title,
+            logicalScreenHeight / 2 - 24, logicalScreenWidth, Color.White);
+        hudFont.DrawCenteredText(_spriteBatch, instruction,
+            logicalScreenHeight / 2 + 8, logicalScreenWidth, Color.White);
     }
 
-    private void DrawGameplay()
-    {
+    /// <summary>
+    /// Draws the level, player, enemies and HUD.
+    /// </summary>
+    private void DrawGameplay() {
         worldRenderer.Draw(_spriteBatch, world, TileSize, HudHeight);
         playerRenderer.Draw(_spriteBatch, player, TileSize, HudHeight);
         entityRenderer.Draw(_spriteBatch, entityManager, TileSize, HudHeight);
         hudRenderer.Draw(_spriteBatch, gameSession, levelState);
     }
 
-    private void DrawEndScreen()
-    {
+    /// <summary>
+    /// Draws the victory screen with player's final score.
+    /// </summary>
+    private void DrawEndScreen() {
         const int boxWidth = 260;
         const int boxHeight = 120;
-
         float logicalWidth = _graphics.PreferredBackBufferWidth / PixelScale;
         float logicalHeight = _graphics.PreferredBackBufferHeight / PixelScale;
-
         int boxX = (int)((logicalWidth - boxWidth) / 2);
         int boxY = (int)((logicalHeight - boxHeight) / 2);
-
         Rectangle box = new Rectangle(boxX, boxY, boxWidth, boxHeight);
-
         _spriteBatch.Draw(pixel, box, Color.DarkBlue);
-
         const string title = "YOU WIN!";
         string scoreText = $"YOUR SCORE IS {gameSession.Score:D5}";
         const string thanks = "THANKS FOR PLAYING!!!";
-
-        hudFont.DrawCenteredText(_spriteBatch, title, boxY + 18, logicalWidth, Color.White);
-        hudFont.DrawCenteredText(_spriteBatch, scoreText, boxY + 50, logicalWidth, Color.White);
-        hudFont.DrawCenteredText(_spriteBatch, thanks, boxY + 82, logicalWidth, Color.White);
+        hudFont.DrawCenteredText(_spriteBatch, title,
+            boxY + 18, logicalWidth, Color.White);
+        hudFont.DrawCenteredText(_spriteBatch, scoreText,
+            boxY + 50, logicalWidth, Color.White);
+        hudFont.DrawCenteredText(_spriteBatch, thanks,
+            boxY + 82, logicalWidth, Color.White);
     }
 
-
-    private bool LoadLevel(int levelNumber)
-    {
+    /// <summary>
+    /// Loads the requested level and replaces all current level tiles.
+    /// There is a pause when level is loaded.
+    /// </summary>
+    /// <param name="levelNumber">Number of level to load.</param>
+    /// <returns>True -> level file exists and was loaded.</returns>
+    private bool LoadLevel(int levelNumber) {
         string fileName = $"Level{levelNumber:D2}.txt";
-        string levelPath = Path.Combine(AppContext.BaseDirectory, "Content", "Levels", fileName);
-
-        if (!File.Exists(levelPath))
-        {
-            return false;
+        string levelPath = Path.Combine(AppContext.BaseDirectory,
+            "Content", "Levels", fileName);
+        bool levelLoaded = File.Exists(levelPath);
+        if (levelLoaded) {
+            LoadedLevel loadedLevel = LevelLoader.Load(levelPath);
+            world = loadedLevel.World;
+            player = loadedLevel.Player;
+            levelState = loadedLevel.LevelState;
+            entityManager = loadedLevel.EntityManager;
+            timerAccumulator = 0;
+            worldSimulation?.Reset();
+            gameplayController.StartLevel();
         }
-        LoadedLevel loadedLevel = LevelLoader.Load(levelPath);
-
-        world = loadedLevel.World;
-        worldSimulation?.Reset();
-        player = loadedLevel.Player;
-        levelState = loadedLevel.LevelState;
-        entityManager = loadedLevel.EntityManager;
-
-        gameplayController.StartLevel();
-        return true;
+        return levelLoaded;
     }
 
-    private bool HandlePlayerDeath()
-    {
+    /// <summary>
+    /// Removes one life after the player's death.
+    /// If life count is below zero: Game returns to title screan.
+    /// </summary>
+    /// <returns>Ture -> Player has no remaining lives == game ended.</returns>
+    private bool HandlePlayerDeath() {
         gameSession.PlayreLives--;
-
-        if (gameSession.PlayreLives < 0)
-        {
-            gameState = GameState.StartScreen;
-            return true;
-        }
-        return false;
+        bool gameEnded = gameSession.PlayreLives < 0;
+        if (gameEnded) gameState = GameState.StartScreen;
+        return gameEnded;
     }
 }

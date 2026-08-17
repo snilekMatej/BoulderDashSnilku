@@ -1,27 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using BoulderDashSnilku.Core;
 using BoulderDashSnilku.World;
 
-namespace BoulderDashSnilku.Rendering
-{
-    public class HudRenderer
-    {
+namespace BoulderDashSnilku.Rendering {
+    /// <summary>
+    /// Builds and draws the gameplay HUD containing player and level information.
+    /// </summary>
+    public class HudRenderer {
         private readonly BitmapFont font;
 
-        public HudRenderer(BitmapFont font)
-        {
+        public HudRenderer(BitmapFont font) {
             this.font = font;
         }
 
-        public void Draw(SpriteBatch spriteBatch, GameSession gameSession, LevelState levelState)
-        {
+        /// <summary>
+        /// Draw the current player and level information
+        /// </summary>
+        public void Draw(SpriteBatch spriteBatch, GameSession gameSession,
+            LevelState levelState) {
             string text = 
                 $"♥{gameSession.PlayreLives}   " +
                 $"{levelState.RequiredGems:D2}/" +

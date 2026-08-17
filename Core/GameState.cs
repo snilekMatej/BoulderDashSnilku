@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BoulderDashSnilku.Core
-{
-    public enum GameState
-    {
+﻿namespace BoulderDashSnilku.Core {
+    /// <summary>
+    /// Main screan currently displayed by the game.
+    /// Used to switch between the title screen, active gameplay and end screen.
+    /// </summary>
+    public enum GameState {
         StartScreen,
         Gameplay,
         EndScreen

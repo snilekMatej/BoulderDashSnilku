@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BoulderDashSnilku.Core
-{
-    public enum GameplayState
-    {
+﻿namespace BoulderDashSnilku.Core {
+    /// <summary>
+    /// Current state of an active level.
+    /// Controlls delays before gameplay and after player deaths.
+    /// </summary>
+    public enum GameplayState {
         WaitingToStart,
         Playing,
         WaitingToRestart
