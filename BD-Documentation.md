@@ -1,33 +1,5 @@
 # Boulder Dash Documentation
 
-## Introduction
-
-This document describes the implementation of my Boulder Dash
-recreation. The goal of the project was to recreate the gameplay of the
-original Boulder Dash while using my own graphics and
-implementation. The mechanics are intentionally kept close to the
-original game, while some technical parts were simplified to fit the
-scope of the project.
-
-## Planned Structure
-
-The documentation will contain the following chapters:
-
-1.  Introduction
-2.  Project Goal
-3.  Technologies Used
-4.  Project Architecture
-5.  World Representation
-6.  Game Loop
-7.  Physics and Algorithms
-8.  Level Format
-9.  Graphics and Rendering
-10. Testing
-11. Reflection
-12. Future Improvements
-
----
-
 ## 1. Introduction
 
 This document describes the implementation of my recreation of the
@@ -239,7 +211,7 @@ and makes the implementation easier to extend.
 
 ## 5. World Representation
 
-The game world is represented using several indipendent data structures.
+The game world is represented using several independent data structures.
 Instead of storing all information in one place, the terrain,
 entities and simulation state are separated. This makes the
 implementation easier to understand and allows every part of
@@ -264,12 +236,10 @@ position. Most gameplay decisions are based on the tile type.
 
 ### Simulation State
 
-Besides the terrain itself, the world stores another 2D array
-with information needed by the simulation.
-
-This array remembers whether a tile has already been
-processed during the current update and if a falling object
-is currently in a falling state.
+Besides the terrai, the simulation stores additional 2D arrays
+to track falling objects. One remembers which objects were falling
+in previous state and another temporary array with already processed
+positions in current update.
 
 Remembering which tiles were already processed is necessary
 because the world is updated tile by tile. Without this,
@@ -365,14 +335,14 @@ after all objects have moved, every object checks whether its
 movement is valid before changing its position.
 
 This approach simplifies the implementation because all
-object are responsible for theyer own movement and
+object are responsible for their own movement and
 collision handling.
 
 ### Special Events
 
 Some situations require the normal update process to stop temporarily.
-When the player dies or player looses all lives the game has to resolve
-the case imedietly.
+When the player dies or player loses all lives the game has to resolve
+the case immediately.
 
 ### Draw
 
@@ -438,8 +408,8 @@ The world is scanned tile by tile. If a boulder is found,
 the game checks whether it can move. First, the tile directly
 below the boulder is checked. The game uses the concept of
 a **truly empty tile**. Such a tile must be `Tile.Empty` and
-has no entity at its postion. If the tile below is truly empty,
-the boulder moves one tile down and is marked as **falling**.
+has no entity at its position. If the tile below is truly empty,
+the boulder is marked as **falling** which allows it to fall next update.
 
 If the tile below is occupied by an entity, the boulder
 cannot fall, unless the boulder was **falling**. Then the entity
@@ -460,7 +430,7 @@ the boulder remains on that tile.
 
 Gems use exactly the same movement rules as boulders.
 
-The only difference is when player moves onto a tile with gem,
+The only difference is when the player moves onto a tile with gem,
 the gem is then collected and is removed from the tile.
 
 ### Processed Tiles
@@ -473,12 +443,9 @@ on one side of the map would fall faster than those on the
 other side because some objects were processed multiple times
 during a single update.
 
-To solve this problem, every tile stores whether it has
-already been processed during the current frame. if a
-boulder moves, its new position is marked as processed. 
-This guarantees that every falling object is updated
-only once during each frame, making it consistent across the
-entire level.
+During each simulation update, a separate array remembers already
+peocessed positions. This guarantees that every falling
+object is updated only once during each update.
 
 ### Enemy Behaviour
 
@@ -497,12 +464,11 @@ an enemy, the player immediately dies.
 ### Explosions
 
 Explosions occur whenever any entity dies. The explosion
-affects the surrounding tiles in all eight directions. If
-every affected tile can be destroyed, the explosion creates
-nine certain tiles around the explosion centre. For enemies these are
-gems and for player these are empty.
-
-Border tiles and the exit are exceptions and cannot be destroyed.
+affects 3x3 area centered on entity. Entities inside that
+area are also killed, which makes them explode as well.
+For enemies destructable tiles are turned into gems and
+Player leaves the tiles empty. Border tiles and the exit
+cannot be destroyed.
 
 ### Design Decisions
 
@@ -648,7 +614,9 @@ no save feature so all progress is lost.
 
 ---
 
-## 11.1 Testing and Debugging
+## 11. Development and Differences
+
+### Testing and Debugging
 
 Testing was performed mainly by manually playing the game and
 checking individual gameplay situations. In addition to the
@@ -675,7 +643,7 @@ in the code.
 
 ---
 
-## 11.2 Differences From the Original Game
+## 12. Differences From the Original Game
 
 The objective was to reproduce the main gameplay of Boulder Dash,
 but the recreation is not an exact copy. Several differences were
@@ -723,7 +691,7 @@ the Boulder Dash gameplay.
 
 ---
 
-## 12. Conclusion
+## 13. Conclusion
 
 The goal of this project was to recreate the main gameplay of the
 original Boulder Dash using C#.

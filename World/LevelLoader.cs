@@ -1,4 +1,8 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Numerics;
+using System;
+using System.Security.Cryptography.X509Certificates;
 using BoulderDashSnilku.Entities;
 
 namespace BoulderDashSnilku.World {
@@ -17,15 +21,14 @@ namespace BoulderDashSnilku.World {
         /// <exception cref="InvalidDataException"></exception>
         public static LoadedLevel Load(string filePath) {
             string[] lines = File.ReadAllLines(filePath);
-            int expectedLines = 3 + GameWorld.DefaultHeight;
-            if (lines.Length != expectedLines)
-                throw new InvalidDataException(
-                    "The level must contain QUOTA, GEMVALUE, TIME, and map data.");
-            int gemQuota = ParseGemQuota(lines[0]);
-            int gemValue = ParseGemValue(lines[1]);
-            int time = ParseTime(lines[2]);
-            string[] mapLines = lines[3..];
+            int mapStart = FindMapStart(lines);
+            Dictionary<string, string> metadata = ReadMetadata(lines, mapStart);
+
+            string[] mapLines = lines[(mapStart + 1)..];
             ValidateLevel(mapLines);
+            int gemQuota = GetMetadataInt(metadata, "QUOTA");
+            int gemValue = GetMetadataInt(metadata, "GEMVALUE");
+            int time = GetMetadataInt(metadata, "TIME");
             GameWorld world = new GameWorld();
             EntityManager entityManager = new EntityManager();
             Player? player = null;
@@ -34,55 +37,38 @@ namespace BoulderDashSnilku.World {
             for (int y = 0; y < world.Height; y++) {
                 for (int x = 0; x < world.Width; x++) {
                     char symbol = mapLines[y][x];
-                    switch (symbol) {
-                        case '.':
-                            world.Grid[x, y] = Tile.Empty;
-                            break;
-                        case '-':
-                            world.Grid[x, y] = Tile.Dirt;
-                            break;
-                        case 'W':
-                            world.Grid[x, y] = Tile.Wall;
-                            break;
-                        case 'B':
-                            world.Grid[x, y] = Tile.Border;
-                            break;
-                        case 'O':
-                            world.Grid[x, y] = Tile.Boulder;
-                            break;
-                        case 'G':
-                            world.Grid[x, y] = Tile.Gem;
-                            break;
-                        case 'P':
-                            if (player != null)
+                    Tile? tile = GetTile(symbol);
+                    if (tile != null) world.Grid[x, y] = tile.Value;
+                    else
+                        switch (symbol) {
+                            case 'P':
+                                if (player != null)
+                                    throw new InvalidDataException(
+                                        $"The level contains multiple player spawns.");
+                                player = new Player(x, y);
+                                entityManager.Add(player);
+                                world.Grid[x, y] = Tile.Empty;
+                                break;
+                            case 'H':
+                                entityManager.Add(new Firefly(x, y));
+                                world.Grid[x, y] = Tile.Empty;
+                                break;
+                            case 'X':
+                                entityManager.Add(new Butterfly(x, y));
+                                world.Grid[x, y] = Tile.Empty;
+                                break;
+                            case 'E':
+                                if (exitX >= 0)
+                                    throw new InvalidDataException(
+                                        $"The level contains multiple exits.");
+                                exitX = x;
+                                exitY = y;
+                                world.Grid[x, y] = Tile.Border;
+                                break;
+                            default:
                                 throw new InvalidDataException(
-                                    $"The level contains multiple player spawns.");
-                            player = new Player(x, y);
-                            entityManager.Add(player);
-                            world.Grid[x, y] = Tile.Empty;
-                            break;
-                        case 'H':
-                            Firefly firefly = new Firefly(x, y);
-                            entityManager.Add(firefly);
-                            world.Grid[x, y] = Tile.Empty;
-                            break;
-                        case 'X':
-                            Butterfly butterfly = new Butterfly(x, y);
-                            entityManager.Add(butterfly);
-                            world.Grid[x, y] = Tile.Empty;
-                            break;
-                        case 'E':
-                            if (exitX >= 0)
-                                throw new InvalidDataException(
-                                    $"The level contains multiple exits.");
-                            exitX = x;
-                            exitY = y;
-                            world.Grid[x, y] = Tile.Border;
-                            break;
-                        default:
-                            throw new InvalidDataException(
-                                $"Unknown level symbol '{symbol}' at ({x}, {y}).");
-                    }
+                                    $"Unknown level symbol '{symbol}' at ({x}, {y}).");
+                        }
                 }
             }
             if (player == null)
@@ -97,52 +83,60 @@ namespace BoulderDashSnilku.World {
         }
 
         /// <summary>
-        /// Read required gem requirement from QUOTA metadata line.
+        /// Find "MAP" marker that separates metadata from world map.
         /// </summary>
-        /// <param name="line"></param>
-        /// <returns>Gem quota</returns>
-        /// <exception cref="InvalidDataException"></exception>
-        private static int ParseGemQuota(string line) {
-            const string prefix = "QUOTA=";
-            if (!line.StartsWith(prefix))
-                throw new InvalidDataException(
-                    $"The first line must use the format {prefix}<number>.");
-            string quotaText = line[prefix.Length..];
-            if (!int.TryParse(quotaText, out int quota) || quota < 0)
-                throw new InvalidDataException($"Invalid gem quota '{quotaText}'.");
-            return quota;
+        /// <returns>Line index containing "MAP".</returns>
+        private static int FindMapStart(string[] lines) {
+            int mapStart = -1;
+            for (int i = 0; i < lines.Length; i++) {
+                if (lines[i].Trim().Equals("MAP", StringComparison.OrdinalIgnoreCase))
+                    mapStart = i;
+            }
+            if (mapStart < 0)
+                throw new InvalidDataException("The level doesn't contain a MAP marker.");
+            return mapStart;
         }
 
         /// <summary>
-        /// Read required gem value from GEMVALUE metadata line.
+        /// Read KEY=VALUE metadata.
+        /// Blank lines are ignored.
+        /// All metadata are located before MAP mark.
         /// </summary>
-        /// <returns>Gem value</returns>
+        /// <returns>Dictionary [Key : Value] </returns>
         /// <exception cref="InvalidDataException"></exception>
-        private static int ParseGemValue(string line) {
-            const string prefix = "GEMVALUE=";
-            if (!line.StartsWith(prefix))
-                throw new InvalidDataException(
-                    $"The second line must use the format {prefix}<number>.");
-            string gemValueText = line[prefix.Length..];
-            if (!int.TryParse(gemValueText, out int gemValue) || gemValue < 0)
-                throw new InvalidDataException($"Invalid gem value '{gemValueText}'");
-            return gemValue;
+        private static Dictionary<string, string> ReadMetadata(string[] lines, int mapStart) {
+            Dictionary<string, string> metadata = new Dictionary<
+                string, string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < mapStart; i++) {
+                string line = lines[i];
+                if (line.Length > 0) {
+                    int separator = line.IndexOf('=');
+                    if (separator <= 0)
+                        throw new InvalidDataException($"Invalid metadata line '{line}'.");
+                    string key = line[..separator].Trim();
+                    string value = line[(separator + 1)..].Trim();
+                    if (metadata.ContainsKey(key))
+                        throw new InvalidDataException($"Metadata '{key}' is defined multiple times.");
+                    metadata.Add(key, value);
+                }
+            }
+            return metadata;
         }
 
         /// <summary>
-        /// Read required remaining time from TIME metadata line.
+        /// Read required metadata value;
         /// </summary>
-        /// <returns>Remaining time</returns>
+        /// <param name="metadata">Metadata collected from level file.</param>
+        /// <param name="key">Name of required metadata entry.</param>
+        /// <returns>Parsed integer value.</returns>
         /// <exception cref="InvalidDataException"></exception>
-        private static int ParseTime(string line) {
-            const string prefix = "TIME=";
-            if (!line.StartsWith(prefix))
-                throw new InvalidDataException(
-                    $"The third line must use the format {prefix}<number>.");
-            string timeText = line[prefix.Length..];
-            if (!int.TryParse(timeText, out int time) || time < 0)
-                throw new InvalidDataException($"Invalid time remaining '{timeText}'");
-            return time;
+        private static int GetMetadataInt(Dictionary<string, string> metadata, string key) {
+            int value = -1;
+            if (!metadata.TryGetValue(key, out string? text))
+                throw new InvalidDataException($"Missing required metadata '{key}'.");
+            if (!int.TryParse(text, out value) || value < 0)
+                throw new InvalidDataException($"Invalid value for '{key}': '{text}'.");
+            return value;
         }
 
         /// <summary>
@@ -150,8 +144,6 @@ namespace BoulderDashSnilku.World {
         /// </summary>
         /// <exception cref="InvalidDataException"></exception>
         private static void ValidateLevel(string[] lines) {
-            if (lines.Length == 0)
-                throw new InvalidDataException("The level file is empty.");
             if (lines.Length != GameWorld.DefaultHeight)
                 throw new InvalidDataException(
                     $"The level height is invalid: y = {lines.Length} != {GameWorld.DefaultHeight}");
@@ -161,6 +153,18 @@ namespace BoulderDashSnilku.World {
                         $"The level width is invalid:" + 
                         $"line({y}).width = {lines[y].Length} != {GameWorld.DefaultWidth}");
             }
+        }
+
+        private static Tile? GetTile(char symbol) {
+            return symbol switch {
+                '.' => Tile.Empty,
+                '-' => Tile.Dirt,
+                'W' => Tile.Wall,
+                'B' => Tile.Border,
+                'O' => Tile.Boulder,
+                'G' => Tile.Gem,
+                _ => null
+            };
         }
     }
 }

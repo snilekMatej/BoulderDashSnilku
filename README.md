@@ -49,6 +49,7 @@ The game is controlled using the keyboard.
 - `Left Arrow` - move left
 - `Right Arrow` - move right
 - `Enter` - confirm / start the game / leave the win screen
+- `Escape` - exit the game
 
 ## Gameplay
 
@@ -88,7 +89,7 @@ Level05.txt
 The actual game starts with `Level01.txt` and ends after `Level05.txt`.
 
 Every normal level contains metadata followed by its map layout.
-Metadata contain:
+The metadata contains:
 
 ```
 QUOTA=10
@@ -107,15 +108,40 @@ normally do not need to be modified.
 
 ## Installation and Running
 
-The project requires .NET and MonoGame.
+### Requirements
 
-The project can be opened using the included Visual Studio solution:
-`BoulderDashSnilku.sln`
+To build and run the game, install:
 
-The game can then be built and started from Visual Studio.
-Alternatively, from the project directory it can be built using:
-`dotnet build` and run using: `dotnet run` The game runs in
-windowed mode.
+- [.NET SDK](https://dotnet.microsoft.com/download)
+- [Visual Studio](https://visualstudio.microsoft.com/) or another IDE
+witch is compatible with .NET
+
+The project MonoGame. Required packages for MonoGame are referenced by
+the project and are restored automatically when the project is built.
+
+[More information about setting up MonoGame](https://docs.monogame.net/articles/getting_started/)
+
+### Running with Visua Studio
+
+1. Clone or download this repository.
+2. Open `BoulderDashSnilku.sln` in Visual Studio.
+3. Wait for project dependencies to restore.
+4. Build and run the project using the **Start** button or `F5`.
+
+### Running from command line
+
+Open a terminal inside project directory and run:
+
+```
+dotnet restore
+dotnet build
+dotnet run
+```
+
+`dotnet restore` downloads the required project dependencies.
+The game can then be built and started using the following 2 commands.
+
+The game runs in windowed mode.
 
 ## Project Structure
 
@@ -139,7 +165,7 @@ Content/
 
 `Input` contains keyboard input handling.
 
-`Library` contains shared constants, directions and utility functions.
+`Library` contains shared direction0related functionality.
 
 `Rendering` contains classes responsible for drawing the world, entities and HUD.
 
@@ -159,8 +185,9 @@ instead of reproducing the exact hardware limitations.
 
 ## Documentation
 
-link[...].
+More detailed information about the implementation can be found
+in the [project documentation](BD-Documentation.md).
 
 It describes the project architecture, world representation,
-game loop, physics, level system, rendering, testing and possible
-future improvements. The documentation is also written in English.
+game loop, physics, level system, rendering and testing.
+The documentation is also written in English.
